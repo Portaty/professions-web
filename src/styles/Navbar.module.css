@@ -1,0 +1,8 @@
+.menuItem {
+    font-weight: 600;
+    color: #1f1f1f;
+    /* border: 1px solid #1f1f1f; */
+}
+.menuItem:hover {
+    background-color: aqua;
+}
