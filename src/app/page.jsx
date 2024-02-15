@@ -1,11 +1,11 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
+import SignIn from "../components/SignIn";
 
 export default function Main() {
   return (
     <div>
-      <Navbar />
+      <SignIn />
     </div>
   );
 }
