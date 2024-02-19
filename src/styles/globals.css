@@ -60,6 +60,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-family: var(--body-font);
 }
 
 body,

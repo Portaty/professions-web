@@ -30,7 +30,8 @@ const Navbar = () => {
                 return {
                   "&:hover": {
                     backgroundColor: "#1f1f1f",
-                    color: '#ffffff'
+                    color: '#ffffff',
+                    fontFamily: 'Montserrat'
                   },
                 };
             },

@@ -78,6 +78,16 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#ffb703",
+                  },
+                },
+                "& label.Mui-focused": {
+                  color: "#1f1f1f",
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -88,6 +98,16 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#ffb703",
+                  },
+                },
+                "& label.Mui-focused": {
+                  color: "#1f1f1f",
+                },
+              }}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -97,12 +117,24 @@ export default function SignIn() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, fontSize: 12, padding: 2 }}
+              sx={{
+                mt: 3,
+                mb: 2,
+                fontSize: 12,
+                padding: 2,
+                backgroundColor: "#ffb703",
+                "&:hover": {
+                  backgroundColor: "#1f1f1f",
+                },
+              }}
             >
-              <Link href="/home" style={{
-                textDecoration: 'none',
-                color: 'inherit'
-              }}>
+              <Link
+                href="/home"
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
                 Iniciar sesion
               </Link>
             </Button>
@@ -110,9 +142,16 @@ export default function SignIn() {
               <Grid item xs></Grid>
 
               <Grid item>
-                {/* <Link href="#" variant="body2">
+                <Link
+                  href="/forgot"
+                  variant="body2"
+                  style={{
+                    color: "#1f1f1f",
+                    fontWeight: 600,
+                  }}
+                >
                   Olvidaste tu contraseña?
-                </Link> */}
+                </Link>
               </Grid>
             </Grid>
           </Box>
