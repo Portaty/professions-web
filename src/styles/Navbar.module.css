@@ -1,6 +1,6 @@
 .menuItem {
     font-weight: 600;
     color: #1f1f1f;
-    font-family: 'Montserrat';
+    font-family: 'Montserrat', sans-serif;
     /* border: 1px solid #1f1f1f; */
 }
