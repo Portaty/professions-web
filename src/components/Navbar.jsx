@@ -10,7 +10,7 @@ import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import FindInPageRoundedIcon from "@mui/icons-material/FindInPageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import styled from "@/styles/Navbar.module.css";
+import styled from "@/styles/Navbar.module.css"; 
 
 const Navbar = () => {
   const [collapsed, setCollapsed] = useState(true);

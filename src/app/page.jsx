@@ -6,7 +6,7 @@ import SignIn from "@/pages/login";
 
 export default function Main() {
   return (
-    <div>
+    <div> 
       <SignIn />
     </div>
   );

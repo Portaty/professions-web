@@ -7,7 +7,7 @@ import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 // const inter = Inter({ subsets: ["latin"] });
 
 // export const metadata = {
-//   title: "Portaty Dashboard",
+//   title: "Portaty Dashboard", 
 //   description: "Creado por Portaty",
 // };
 
