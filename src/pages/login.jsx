@@ -59,6 +59,7 @@ export default function SignIn() {
             alt="Descripción de la imagen"
             width={100}
             height={100}
+            priority
           />
           <Typography component="h1" variant="h5">
             Dashboard
@@ -113,8 +114,8 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Recuerdame"
             />
-            <Button 
-              // type="submit"
+            <Button
+              type="submit"
               fullWidth
               variant="contained"
               sx={{
