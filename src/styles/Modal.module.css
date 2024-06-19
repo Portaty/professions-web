@@ -1,0 +1,84 @@
+.modal {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .content {
+    padding: 2rem;
+    background-color: white;
+    height: 550px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+  
+  .top {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .inputs {
+    flex-direction: column;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .input {
+    display: flex;
+    width: 700px;
+    gap: 1.5rem;
+  }
+  .input input {
+    width: 350px;
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+  .button {
+    display: flex;
+    gap: 1rem;
+  }
+  .title h2 {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 24px;
+  }
+  .datetime {
+    display: flex;
+    width: 700px;
+    gap: 1.5rem;
+  }
+  .date input {
+    width: 275px;
+  }
+  .time input {
+    width: 310px;
+  }
+  .textfield {
+    font-size: 12px;
+  }
+  
+  .inputImage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  .imageSelect {
+    height: 152px;
+    width: 152px;
+    border: 1px dashed #2f2f2f;
+  }
+  .imageNothing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    width: 150px;
+    border: 1px dashed #2f2f2f;
+  }

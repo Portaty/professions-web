@@ -14,10 +14,11 @@ import {
 import { Button, Stack, Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { esES } from "@mui/material/locale";
+import { cards } from "@/constants/cards";
 
-const Tables = ({ select }) => {
+const TableBusiness = () => {
   const [data, setData] = useState([]);
-  const [tableUsers, setTableUsers] = useState([]);
+  const [table, setTable] = useState([]);
   const [selectedInfo, setSelectedInfo] = useState(1);
   const columns = [
     { field: "id", headerName: "ID", width: 150 },
@@ -40,22 +41,22 @@ const Tables = ({ select }) => {
       editable: true,
     },
   ];
-  const fetchDataUsers = async () => {
+  const fetchData = async () => {
     try {
       const fetchAll = async (nextToken, result = []) => {
         const response = await API.graphql({
-          query: queries.listUsers,
+          query: queries.listBusinesses,
           authMode: "AMAZON_COGNITO_USER_POOLS",
           variables: {
             nextToken,
           },
         });
         console.log(response);
-        const items = response.data.listUsers.items;
+        const items = response.data.listBusinesses.items;
         result.push(...items);
 
-        if (response.data.listUsers.nextToken) {
-          return fetchAll(response.data.listUsers.nextToken, result);
+        if (response.data.listBusinesses.nextToken) {
+          return fetchAll(response.data.listBusinesses.nextToken, result);
         }
 
         return result;
@@ -127,21 +128,20 @@ const Tables = ({ select }) => {
       list.forEach((objeto) => {
         const mes = new Date(objeto.createdAt).getMonth();
         const mesEnArray = meses.find((m) => m.valor === mes);
-
         if (mesEnArray) {
           mesEnArray.registros += 1;
         }
       });
 
       setData(meses);
-      setTableUsers(list);
+      setTable(list);
     } catch (error) {
       console.error(error);
     }
   };
+
   useEffect(() => {
-    console.log("aqui", data);
-    fetchDataUsers();
+    fetchData();
   }, []);
 
   return (
@@ -209,7 +209,7 @@ const Tables = ({ select }) => {
       ) : (
         <Box sx={{ height: 350, width: 850 }}>
           <DataGrid
-            rows={tableUsers}
+            rows={table}
             columns={columns}
             initialState={{
               pagination: {
@@ -221,9 +221,9 @@ const Tables = ({ select }) => {
             pageSizeOptions={[10]}
             density="compact"
             sx={{
-                fontFamily: 'Montserrat',
-              }}
-              showColumnVerticalBorder
+              fontFamily: "Montserrat",
+            }}
+            showColumnVerticalBorder
             slots={{ toolbar: GridToolbar }}
           />
         </Box>
@@ -232,4 +232,4 @@ const Tables = ({ select }) => {
   );
 };
 
-export default Tables;
+export default TableBusiness;

@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { cards } from "@/constants/cards";
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import Tables from "./Tables";
+import TableUser from "./TableUser";
+import TableBusiness from "./TableBusiness";
 
 const SelectCard = () => {
-  const [card, setCard] = useState("");
+  const [card, setCard] = useState('');
 
   const handleChange = (e) => {
-    console.log(e.target.value);
+    console.log(e);
     setCard(e.target.value);
   };
   return (
@@ -48,7 +49,8 @@ const SelectCard = () => {
           ))}
         </Select>
       </FormControl>
-      {card && <Tables data={card} />}
+      {card === "Usuarios registrados" && <TableUser />}
+      {card === "Negocios registrados" && <TableBusiness />}
     </div>
   );
 };

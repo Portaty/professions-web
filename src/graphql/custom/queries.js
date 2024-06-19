@@ -17,3 +17,81 @@ export const listUsers = /* GraphQL */ `
     }
   }
 `;
+
+export const listBusinesses = /* GraphQL */ `
+  query ListBusinesses(
+    $filter: ModelBusinessFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBusinesses(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        userID
+        status
+        identityID
+        name
+        image
+        images
+        thumbnail
+        email
+        phone
+        whatsapp
+        instagram
+        facebook
+        page
+        activity
+        tags
+        description
+        prefer
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;
+
+export const listBusinessbyUserID = /* GraphQL */ `
+  query ListBusinessbyUserID(
+    $userID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelBusinessFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBusinessbyUserID(
+      userID: $userID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userID
+        status
+        identityID
+        name
+        image
+        images
+        thumbnail
+        email
+        phone
+        whatsapp
+        instagram
+        facebook
+        page
+        activity
+        tags
+        description
+        prefer
+        createdAt
+        updatedAt
+        owner
+      }
+      nextToken
+    }
+  }
+`;

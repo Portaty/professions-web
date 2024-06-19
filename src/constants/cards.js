@@ -1,7 +1,7 @@
 export const cards = [
-    {
-        title: 'Negocios por usuarios'
-    },
+    // {
+    //     title: 'Negocios por usuarios',
+    // },
     {
         title: 'Usuarios registrados',
     },
