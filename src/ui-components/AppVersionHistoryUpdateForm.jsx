@@ -13,10 +13,10 @@ import {
   SelectField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { API } from "aws-amplify";
-import { getAppVersionHistory } from "../graphql/queries";
-import { updateAppVersionHistory } from "../graphql/mutations";
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { AppVersionHistory } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
 export default function AppVersionHistoryUpdateForm(props) {
   const {
     id: idProp,
@@ -55,12 +55,7 @@ export default function AppVersionHistoryUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? (
-            await API.graphql({
-              query: getAppVersionHistory.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getAppVersionHistory
+        ? await DataStore.query(AppVersionHistory, idProp)
         : appVersionHistoryModelProp;
       setAppVersionHistoryRecord(record);
     };
@@ -126,26 +121,21 @@ export default function AppVersionHistoryUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value === "") {
-              modelFields[key] = null;
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
             }
           });
-          await API.graphql({
-            query: updateAppVersionHistory.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                id: appVersionHistoryRecord.id,
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(
+            AppVersionHistory.copyOf(appVersionHistoryRecord, (updated) => {
+              Object.assign(updated, modelFields);
+            })
+          );
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}
