@@ -15,6 +15,7 @@ import { Button, Stack, Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { esES } from "@mui/material/locale";
 import { cards } from "@/constants/cards";
+import Link from "next/link";
 
 const TableBusiness = () => {
   const [data, setData] = useState([]);
@@ -29,16 +30,51 @@ const TableBusiness = () => {
       editable: true,
     },
     {
-      field: "lastName",
-      headerName: "Apellido",
-      width: 150,
-      editable: true,
-    },
-    {
       field: "email",
       headerName: "Correo",
       width: 300,
       editable: true,
+    },
+    {
+      field: "phone",
+      headerName: "Telefono",
+      width: 150,
+      editable: true,
+    },
+    {
+      field: "area",
+      headerName: "Area",
+      width: 200,
+      editable: true,
+      renderCell: (params) => {
+        let act = JSON.parse(params.row.activity);
+        return <div>{act.main}</div>;
+      },
+    },
+    {
+      field: "activity",
+      headerName: "Actividad",
+      width: 200,
+      editable: true,
+      renderCell: (params) => {
+        let act = JSON.parse(params.row.activity);
+        return <div>{act.sub}</div>;
+      },
+    },
+    {
+      field: "thumbnail",
+      headerName: "Foto",
+      width: 150,
+      editable: true,
+      renderCell: (params) => {
+        return (
+          <div>
+            <Link href={params.row.thumbnail} target="_blank">
+              Ver foto
+            </Link>
+          </div>
+        );
+      },
     },
   ];
   const fetchData = async () => {

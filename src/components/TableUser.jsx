@@ -46,7 +46,7 @@ const TableUser = () => {
     },
     {
       field: "actions",
-      headerName: "Acciones",
+      headerName: "Negocio(s)",
       width: 250,
       renderCell: (params) => {
         return (
@@ -57,17 +57,17 @@ const TableUser = () => {
                 setOpen(true);
               }}
               style={{
-                padding: 10,
+                padding: 7,
                 outline: "none",
                 backgroundColor: "green",
                 border: "none",
                 borderRadius: 4,
                 color: "#fff",
                 marginLeft: 5,
-                fontSize: 9,
+                fontSize: 12,
               }}
             >
-              Ver negocio
+              Negocios
             </button>
           </div>
         );
