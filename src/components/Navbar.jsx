@@ -8,10 +8,10 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import styled from "@/styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
+import { Auth } from "aws-amplify";
 const Navbar = () => {
   const [collapsed, setCollapsed] = useState(true);
-  const router = useRouter()
+  const router = useRouter();
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <Sidebar
@@ -55,7 +55,7 @@ const Navbar = () => {
               <MenuItem
                 icon={<BarChartRoundedIcon />}
                 className={styled.menuItem}
-                onClick={() => router.push('/stats')}
+                onClick={() => router.push("/stats")}
               >
                 {/* <Link href="/stats" > Estadisticas </Link> */}
                 Estadisticas
@@ -80,6 +80,7 @@ const Navbar = () => {
               <MenuItem
                 icon={<LogoutRoundedIcon />}
                 className={styled.menuItem}
+                onClick={() => Auth.signOut()}
               >
                 {" "}
                 Salir{" "}

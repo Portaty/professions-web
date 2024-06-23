@@ -1,21 +1,11 @@
 import '../../public/styles/globals.css'
 import '../../public/styles/font.css'
+import '../configureAmplify'
 import { useEffect } from 'react'
-import { Amplify, Hub } from "aws-amplify";
-import config from "../aws-exports.js";
+import { Hub, Auth } from "aws-amplify";
+
 import { useRouter } from "next/navigation";
 
-Amplify.configure({
-  ...config,
-  API: {
-    endpoints: [
-      {
-        name: "api-portaty",
-        endpoint: "https://z5i64n32d6.execute-api.us-east-1.amazonaws.com/prod",
-      },
-    ],
-  }, ssr: true
-});
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -32,14 +22,35 @@ export default function MyApp({ Component, pageProps }) {
           break;
         case "signOut":
           console.log("USER SIGNOUT")
+          router.push("/")
           break;
         default:
           break;
       }
 
     });
-
+    checkUser()
     return unsubscribe;
   }, [])
+  const checkUser = async () => {
+    try {
+      await Auth.currentAuthenticatedUser();
+      router.push("/home")
+    } catch (error) {
+      router.push("/")
+    }
+  }
   return <Component {...pageProps} />;
+}
+
+
+
+export async function getServerSideProps({ req }) {
+  console.log("BUENO AQUI TAMOS")
+
+  return {
+    props: {
+
+    },
+  };
 }

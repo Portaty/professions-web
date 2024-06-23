@@ -43,6 +43,7 @@ export default function SignIn() {
   const [userChangePwd, setUserChangePwd] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (event) => {
+    "use client";
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const challengeResponse = "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED";
