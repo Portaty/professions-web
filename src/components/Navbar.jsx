@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-import {
-  Sidebar,
-  Menu,
-  MenuItem,
-  SubMenu,
-} from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import FindInPageRoundedIcon from "@mui/icons-material/FindInPageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
-import styled from "@/styles/Navbar.module.css"; 
+import styled from "@/styles/Navbar.module.css";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const [collapsed, setCollapsed] = useState(true);
+  const router = useRouter()
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <Sidebar
@@ -30,8 +28,8 @@ const Navbar = () => {
                 return {
                   "&:hover": {
                     backgroundColor: "#1f1f1f",
-                    color: '#ffffff',
-                    fontFamily: 'Montserrat'
+                    color: "#ffffff",
+                    fontFamily: "Montserrat",
                   },
                 };
             },
@@ -57,9 +55,10 @@ const Navbar = () => {
               <MenuItem
                 icon={<BarChartRoundedIcon />}
                 className={styled.menuItem}
+                onClick={() => router.push('/stats')}
               >
-                {" "}
-                Estadisticas{" "}
+                {/* <Link href="/stats" > Estadisticas </Link> */}
+                Estadisticas
               </MenuItem>
               <MenuItem
                 icon={<FindInPageRoundedIcon />}
