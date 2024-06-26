@@ -271,7 +271,7 @@ const TableBusiness = () => {
           />
         </LineChart>
       ) : (
-        <Box sx={{ height: 350, width: 850 }}>
+        <Box sx={{ height: 380, width: 950 }}>
           <DataGrid
             rows={table}
             columns={columns}

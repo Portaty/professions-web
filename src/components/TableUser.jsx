@@ -270,7 +270,7 @@ const TableUser = () => {
           />
         </LineChart>
       ) : (
-        <Box sx={{ height: 350, width: 850 }}>
+        <Box sx={{ height: 380, width: '100%' }}>
           <DataGrid
             rows={table}
             columns={columns}

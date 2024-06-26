@@ -5,6 +5,7 @@ import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import FindInPageRoundedIcon from "@mui/icons-material/FindInPageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import styled from "@/styles/Navbar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -41,13 +42,14 @@ const Navbar = () => {
               flexDirection: "column",
               justifyContent: "space-between",
               height: "100vh",
-              paddingVertical: 10,
+              // paddingVertical: 10,
             }}
           >
             <div>
               <MenuItem
                 icon={<DashboardRoundedIcon />}
                 className={styled.menuItem}
+                onClick={() => router.push('/home')}
               >
                 {" "}
                 Inicio{" "}
@@ -58,6 +60,13 @@ const Navbar = () => {
                 onClick={() => router.push('/stats')}
               >
                 Estadísticas
+              </MenuItem>
+              <MenuItem
+                icon={<NotificationsIcon />}
+                className={styled.menuItem}
+                onClick={() => router.push('/notifications')}
+              >
+                Notificaciones
               </MenuItem>
               <MenuItem
                 icon={<FindInPageRoundedIcon />}
