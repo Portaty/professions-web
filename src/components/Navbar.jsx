@@ -57,8 +57,7 @@ const Navbar = () => {
                 className={styled.menuItem}
                 onClick={() => router.push('/stats')}
               >
-                {/* <Link href="/stats" > Estadisticas </Link> */}
-                Estadisticas
+                Estadísticas
               </MenuItem>
               <MenuItem
                 icon={<FindInPageRoundedIcon />}
