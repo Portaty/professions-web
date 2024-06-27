@@ -62,6 +62,26 @@ const TableBusiness = () => {
       },
     },
     {
+      field: "date",
+      headerName: "Fecha de registro",
+      width: 200,
+      editable: true,
+      renderCell: (params) => {
+        const fechaActual = new Date(params.row.createdAt);
+        const opciones = {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          timeZone: "America/Caracas",
+        };
+        const fechaFormateada = fechaActual.toLocaleDateString(
+          "es-VE",
+          opciones
+        );
+        return <div>{fechaFormateada}</div>;
+      },
+    },
+    {
       field: "thumbnail",
       headerName: "Foto",
       width: 150,
@@ -162,15 +182,23 @@ const TableBusiness = () => {
         },
       ];
       list.forEach((objeto) => {
-        const mes = new Date(objeto.createdAt).getMonth();
-        const mesEnArray = meses.find((m) => m.valor === mes);
+        const fechaActual = new Date(objeto.createdAt);
+        const opciones = {
+          month: "numeric",
+          timeZone: "America/Caracas",
+        };
+        const mes = fechaActual.toLocaleDateString("es-VE", opciones);
+        const mesEnArray = meses.find((m) => m.valor === Number(mes));
         if (mesEnArray) {
           mesEnArray.registros += 1;
         }
       });
 
       setData(meses);
-      setTable(list);
+      const datosOrdenados = list.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setTable(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
@@ -243,7 +271,7 @@ const TableBusiness = () => {
           />
         </LineChart>
       ) : (
-        <Box sx={{ height: 350, width: 850 }}>
+        <Box sx={{ height: 380, width: 950 }}>
           <DataGrid
             rows={table}
             columns={columns}

@@ -16,6 +16,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { esES } from "@mui/material/locale";
 import { cards } from "@/constants/cards";
 import ModalBusinessbyUser from "./ModalBusinessbyUser";
+import { isNumber } from "@mui/x-data-grid/internals";
 
 const TableUser = () => {
   const [data, setData] = useState([]);
@@ -42,7 +43,26 @@ const TableUser = () => {
       field: "email",
       headerName: "Correo",
       width: 300,
+    },
+    {
+      field: "date",
+      headerName: "Fecha de registro",
+      width: 200,
       editable: true,
+      renderCell: (params) => {
+        const fechaActual = new Date(params.row.createdAt);
+        const opciones = {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          timeZone: "America/Caracas",
+        };
+        const fechaFormateada = fechaActual.toLocaleDateString(
+          "es-VE",
+          opciones
+        );
+        return <div>{fechaFormateada}</div>;
+      },
     },
     {
       field: "actions",
@@ -159,16 +179,25 @@ const TableUser = () => {
         },
       ];
       list.forEach((objeto) => {
-        const mes = new Date(objeto.createdAt).getMonth();
-        const mesEnArray = meses.find((m) => m.valor === mes);
-
+        const fechaActual = new Date(objeto.createdAt);
+        const opciones = {
+          month: "numeric",
+          timeZone: "America/Caracas",
+        };
+        const mes = fechaActual.toLocaleDateString("es-VE", opciones);
+        const mesEnArray = meses.find((m) => m.valor === Number(mes));
         if (mesEnArray) {
           mesEnArray.registros += 1;
         }
       });
 
       setData(meses);
-      setTable(list);
+
+      /* Orden por fecha */
+      const datosOrdenados = list.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setTable(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
@@ -241,7 +270,7 @@ const TableUser = () => {
           />
         </LineChart>
       ) : (
-        <Box sx={{ height: 350, width: 850 }}>
+        <Box sx={{ height: 380, width: '100%' }}>
           <DataGrid
             rows={table}
             columns={columns}
