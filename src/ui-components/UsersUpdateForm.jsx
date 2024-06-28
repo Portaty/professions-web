@@ -18,10 +18,10 @@ import {
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
-import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { API } from "aws-amplify";
-import { getUsers } from "../graphql/queries";
-import { updateUsers } from "../graphql/mutations";
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { Users } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
 function ArrayField({
   items = [],
   onChange,
@@ -34,7 +34,6 @@ function ArrayField({
   defaultFieldValue,
   lengthLimit,
   getBadgeText,
-  runValidationTasks,
   errorMessage,
 }) {
   const labelElement = <Text>{label}</Text>;
@@ -58,7 +57,6 @@ function ArrayField({
     setSelectedBadgeIndex(undefined);
   };
   const addItem = async () => {
-    const { hasError } = runValidationTasks();
     if (
       currentFieldValue !== undefined &&
       currentFieldValue !== null &&
@@ -168,7 +166,12 @@ function ArrayField({
               }}
             ></Button>
           )}
-          <Button size="small" variation="link" onClick={addItem}>
+          <Button
+            size="small"
+            variation="link"
+            isDisabled={hasError}
+            onClick={addItem}
+          >
             {selectedBadgeIndex !== undefined ? "Save" : "Add"}
           </Button>
         </Flex>
@@ -229,12 +232,7 @@ export default function UsersUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? (
-            await API.graphql({
-              query: getUsers.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getUsers
+        ? await DataStore.query(Users, idProp)
         : usersModelProp;
       setUsersRecord(record);
     };
@@ -280,14 +278,14 @@ export default function UsersUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          cognitoID: cognitoID ?? null,
-          name: name ?? null,
-          lastName: lastName ?? null,
-          email: email ?? null,
-          identityID: identityID ?? null,
-          gender: gender ?? null,
-          notificationToken: notificationToken ?? null,
-          owner: owner ?? null,
+          cognitoID,
+          name,
+          lastName,
+          email,
+          identityID,
+          gender,
+          notificationToken,
+          owner,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -313,26 +311,21 @@ export default function UsersUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value === "") {
-              modelFields[key] = null;
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
             }
           });
-          await API.graphql({
-            query: updateUsers.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                id: usersRecord.id,
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(
+            Users.copyOf(usersRecord, (updated) => {
+              Object.assign(updated, modelFields);
+            })
+          );
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}
@@ -549,12 +542,6 @@ export default function UsersUpdateForm(props) {
         label={"Notification token"}
         items={notificationToken}
         hasError={errors?.notificationToken?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks(
-            "notificationToken",
-            currentNotificationTokenValue
-          )
-        }
         errorMessage={errors?.notificationToken?.errorMessage}
         setFieldValue={setCurrentNotificationTokenValue}
         inputFieldRef={notificationTokenRef}

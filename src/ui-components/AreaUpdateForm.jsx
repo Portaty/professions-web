@@ -7,10 +7,10 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
-import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { API } from "aws-amplify";
-import { getArea } from "../graphql/queries";
-import { updateArea } from "../graphql/mutations";
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { Area } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
 export default function AreaUpdateForm(props) {
   const {
     id: idProp,
@@ -39,12 +39,7 @@ export default function AreaUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? (
-            await API.graphql({
-              query: getArea.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getArea
+        ? await DataStore.query(Area, idProp)
         : areaModelProp;
       setAreaRecord(record);
     };
@@ -106,26 +101,21 @@ export default function AreaUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value === "") {
-              modelFields[key] = null;
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
             }
           });
-          await API.graphql({
-            query: updateArea.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                id: areaRecord.id,
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(
+            Area.copyOf(areaRecord, (updated) => {
+              Object.assign(updated, modelFields);
+            })
+          );
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}

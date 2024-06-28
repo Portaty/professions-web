@@ -13,8 +13,8 @@
   width: 100%;
   height: 95vh;
   padding: 30px;
+  overflow: auto;
 }
-
 .boxes {
   display: flex;
   flex-direction: column;

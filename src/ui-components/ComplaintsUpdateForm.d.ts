@@ -6,16 +6,8 @@
 
 import * as React from "react";
 import { GridProps, SelectFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
-export declare type EscapeHatchProps = {
-    [elementHierarchy: string]: Record<string, unknown>;
-} | null;
-export declare type VariantValues = {
-    [key: string]: string;
-};
-export declare type Variant = {
-    variantValues: VariantValues;
-    overrides: EscapeHatchProps;
-};
+import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+import { Complaints } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -51,7 +43,7 @@ export declare type ComplaintsUpdateFormProps = React.PropsWithChildren<{
     overrides?: ComplaintsUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    complaints?: any;
+    complaints?: Complaints;
     onSubmit?: (fields: ComplaintsUpdateFormInputValues) => ComplaintsUpdateFormInputValues;
     onSuccess?: (fields: ComplaintsUpdateFormInputValues) => void;
     onError?: (fields: ComplaintsUpdateFormInputValues, errorMessage: string) => void;
