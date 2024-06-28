@@ -9,8 +9,8 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { createArea } from "../graphql/mutations";
-export default function AreaCreateForm(props) {
+import { createNotifiationHistory } from "../graphql/mutations";
+export default function NotifiationHistoryCreateForm(props) {
   const {
     clearOnSuccess = true,
     onSuccess,
@@ -22,16 +22,20 @@ export default function AreaCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    name: "",
+    title: "",
+    message: "",
   };
-  const [name, setName] = React.useState(initialValues.name);
+  const [title, setTitle] = React.useState(initialValues.title);
+  const [message, setMessage] = React.useState(initialValues.message);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setName(initialValues.name);
+    setTitle(initialValues.title);
+    setMessage(initialValues.message);
     setErrors({});
   };
   const validations = {
-    name: [{ type: "Required" }],
+    title: [{ type: "Required" }],
+    message: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -59,7 +63,8 @@ export default function AreaCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
+          title,
+          message,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -90,7 +95,7 @@ export default function AreaCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createArea.replaceAll("__typename", ""),
+            query: createNotifiationHistory.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
@@ -110,32 +115,58 @@ export default function AreaCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "AreaCreateForm")}
+      {...getOverrideProps(overrides, "NotifiationHistoryCreateForm")}
       {...rest}
     >
       <TextField
-        label="Name"
+        label="Title"
         isRequired={true}
         isReadOnly={false}
-        value={name}
+        value={title}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name: value,
+              title: value,
+              message,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.title ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.title?.hasError) {
+            runValidationTasks("title", value);
           }
-          setName(value);
+          setTitle(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("title", title)}
+        errorMessage={errors.title?.errorMessage}
+        hasError={errors.title?.hasError}
+        {...getOverrideProps(overrides, "title")}
+      ></TextField>
+      <TextField
+        label="Message"
+        isRequired={false}
+        isReadOnly={false}
+        value={message}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              title,
+              message: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.message ?? value;
+          }
+          if (errors.message?.hasError) {
+            runValidationTasks("message", value);
+          }
+          setMessage(value);
+        }}
+        onBlur={() => runValidationTasks("message", message)}
+        errorMessage={errors.message?.errorMessage}
+        hasError={errors.message?.hasError}
+        {...getOverrideProps(overrides, "message")}
       ></TextField>
       <Flex
         justifyContent="space-between"

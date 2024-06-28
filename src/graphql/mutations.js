@@ -12,6 +12,7 @@ export const createAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -26,6 +27,7 @@ export const updateAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -40,6 +42,90 @@ export const deleteAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
+    }
+  }
+`;
+export const createReports = /* GraphQL */ `
+  mutation CreateReports(
+    $input: CreateReportsInput!
+    $condition: ModelReportsConditionInput
+  ) {
+    createReports(input: $input, condition: $condition) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateReports = /* GraphQL */ `
+  mutation UpdateReports(
+    $input: UpdateReportsInput!
+    $condition: ModelReportsConditionInput
+  ) {
+    updateReports(input: $input, condition: $condition) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteReports = /* GraphQL */ `
+  mutation DeleteReports(
+    $input: DeleteReportsInput!
+    $condition: ModelReportsConditionInput
+  ) {
+    deleteReports(input: $input, condition: $condition) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteBusinessComment = /* GraphQL */ `
+  mutation DeleteBusinessComment(
+    $input: DeleteBusinessCommentInput!
+    $condition: ModelBusinessCommentConditionInput
+  ) {
+    deleteBusinessComment(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
     }
   }
 `;
@@ -53,18 +139,57 @@ export const deleteComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
+    }
+  }
+`;
+export const createNotificationHistory = /* GraphQL */ `
+  mutation CreateNotificationHistory(
+    $input: CreateNotificationHistoryInput!
+    $condition: ModelNotificationHistoryConditionInput
+  ) {
+    createNotificationHistory(input: $input, condition: $condition) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateNotificationHistory = /* GraphQL */ `
+  mutation UpdateNotificationHistory(
+    $input: UpdateNotificationHistoryInput!
+    $condition: ModelNotificationHistoryConditionInput
+  ) {
+    updateNotificationHistory(input: $input, condition: $condition) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteNotificationHistory = /* GraphQL */ `
+  mutation DeleteNotificationHistory(
+    $input: DeleteNotificationHistoryInput!
+    $condition: ModelNotificationHistoryConditionInput
+  ) {
+    deleteNotificationHistory(input: $input, condition: $condition) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
     }
   }
 `;
@@ -78,9 +203,11 @@ export const createArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -94,9 +221,11 @@ export const updateArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -110,9 +239,11 @@ export const deleteArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -130,9 +261,11 @@ export const createActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -150,9 +283,11 @@ export const updateActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -170,9 +305,11 @@ export const deleteActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -192,13 +329,20 @@ export const createUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -218,13 +362,20 @@ export const updateUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -244,13 +395,20 @@ export const deleteUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -274,6 +432,7 @@ export const createBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -290,17 +449,26 @@ export const createBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -324,6 +492,7 @@ export const updateBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -340,17 +509,26 @@ export const updateBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -374,6 +552,7 @@ export const deleteBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -390,17 +569,90 @@ export const deleteBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
+    }
+  }
+`;
+export const createBusinessComment = /* GraphQL */ `
+  mutation CreateBusinessComment(
+    $input: CreateBusinessCommentInput!
+    $condition: ModelBusinessCommentConditionInput
+  ) {
+    createBusinessComment(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const updateBusinessComment = /* GraphQL */ `
+  mutation UpdateBusinessComment(
+    $input: UpdateBusinessCommentInput!
+    $condition: ModelBusinessCommentConditionInput
+  ) {
+    updateBusinessComment(input: $input, condition: $condition) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
     }
   }
 `;
@@ -431,9 +683,12 @@ export const createFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -448,11 +703,13 @@ export const createFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -483,9 +740,12 @@ export const updateFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -500,11 +760,13 @@ export const updateFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -535,9 +797,12 @@ export const deleteFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -552,11 +817,13 @@ export const deleteFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -570,18 +837,12 @@ export const createComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -595,18 +856,12 @@ export const updateComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -621,6 +876,7 @@ export const createReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -635,6 +891,7 @@ export const updateReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -649,6 +906,7 @@ export const deleteReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -668,6 +926,7 @@ export const createLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -687,6 +946,7 @@ export const updateLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -706,6 +966,7 @@ export const deleteLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;

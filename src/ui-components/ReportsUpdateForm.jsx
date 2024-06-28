@@ -15,12 +15,12 @@ import {
 } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { getAppVersionHistory } from "../graphql/queries";
-import { updateAppVersionHistory } from "../graphql/mutations";
-export default function AppVersionHistoryUpdateForm(props) {
+import { getReports } from "../graphql/queries";
+import { updateReports } from "../graphql/mutations";
+export default function ReportsUpdateForm(props) {
   const {
     id: idProp,
-    appVersionHistory: appVersionHistoryModelProp,
+    reports: reportsModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -30,47 +30,49 @@ export default function AppVersionHistoryUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    platform: "",
-    latestVersion: "",
-    createdAt: "",
+    userID: "",
+    subject: "",
+    description: "",
+    status: "",
   };
-  const [platform, setPlatform] = React.useState(initialValues.platform);
-  const [latestVersion, setLatestVersion] = React.useState(
-    initialValues.latestVersion
+  const [userID, setUserID] = React.useState(initialValues.userID);
+  const [subject, setSubject] = React.useState(initialValues.subject);
+  const [description, setDescription] = React.useState(
+    initialValues.description
   );
-  const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
+  const [status, setStatus] = React.useState(initialValues.status);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = appVersionHistoryRecord
-      ? { ...initialValues, ...appVersionHistoryRecord }
+    const cleanValues = reportsRecord
+      ? { ...initialValues, ...reportsRecord }
       : initialValues;
-    setPlatform(cleanValues.platform);
-    setLatestVersion(cleanValues.latestVersion);
-    setCreatedAt(cleanValues.createdAt);
+    setUserID(cleanValues.userID);
+    setSubject(cleanValues.subject);
+    setDescription(cleanValues.description);
+    setStatus(cleanValues.status);
     setErrors({});
   };
-  const [appVersionHistoryRecord, setAppVersionHistoryRecord] = React.useState(
-    appVersionHistoryModelProp
-  );
+  const [reportsRecord, setReportsRecord] = React.useState(reportsModelProp);
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
         ? (
             await API.graphql({
-              query: getAppVersionHistory.replaceAll("__typename", ""),
+              query: getReports.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
-          )?.data?.getAppVersionHistory
-        : appVersionHistoryModelProp;
-      setAppVersionHistoryRecord(record);
+          )?.data?.getReports
+        : reportsModelProp;
+      setReportsRecord(record);
     };
     queryData();
-  }, [idProp, appVersionHistoryModelProp]);
-  React.useEffect(resetStateValues, [appVersionHistoryRecord]);
+  }, [idProp, reportsModelProp]);
+  React.useEffect(resetStateValues, [reportsRecord]);
   const validations = {
-    platform: [{ type: "Required" }],
-    latestVersion: [{ type: "Required" }],
-    createdAt: [{ type: "Required" }],
+    userID: [{ type: "Required" }],
+    subject: [{ type: "Required" }],
+    description: [{ type: "Required" }],
+    status: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -98,9 +100,10 @@ export default function AppVersionHistoryUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          platform,
-          latestVersion,
-          createdAt,
+          userID,
+          subject,
+          description,
+          status: status ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -131,10 +134,10 @@ export default function AppVersionHistoryUpdateForm(props) {
             }
           });
           await API.graphql({
-            query: updateAppVersionHistory.replaceAll("__typename", ""),
+            query: updateReports.replaceAll("__typename", ""),
             variables: {
               input: {
-                id: appVersionHistoryRecord.id,
+                id: reportsRecord.id,
                 ...modelFields,
               },
             },
@@ -149,98 +152,128 @@ export default function AppVersionHistoryUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "AppVersionHistoryUpdateForm")}
+      {...getOverrideProps(overrides, "ReportsUpdateForm")}
       {...rest}
     >
+      <TextField
+        label="User id"
+        isRequired={true}
+        isReadOnly={false}
+        value={userID}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID: value,
+              subject,
+              description,
+              status,
+            };
+            const result = onChange(modelFields);
+            value = result?.userID ?? value;
+          }
+          if (errors.userID?.hasError) {
+            runValidationTasks("userID", value);
+          }
+          setUserID(value);
+        }}
+        onBlur={() => runValidationTasks("userID", userID)}
+        errorMessage={errors.userID?.errorMessage}
+        hasError={errors.userID?.hasError}
+        {...getOverrideProps(overrides, "userID")}
+      ></TextField>
+      <TextField
+        label="Subject"
+        isRequired={true}
+        isReadOnly={false}
+        value={subject}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID,
+              subject: value,
+              description,
+              status,
+            };
+            const result = onChange(modelFields);
+            value = result?.subject ?? value;
+          }
+          if (errors.subject?.hasError) {
+            runValidationTasks("subject", value);
+          }
+          setSubject(value);
+        }}
+        onBlur={() => runValidationTasks("subject", subject)}
+        errorMessage={errors.subject?.errorMessage}
+        hasError={errors.subject?.hasError}
+        {...getOverrideProps(overrides, "subject")}
+      ></TextField>
+      <TextField
+        label="Description"
+        isRequired={true}
+        isReadOnly={false}
+        value={description}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID,
+              subject,
+              description: value,
+              status,
+            };
+            const result = onChange(modelFields);
+            value = result?.description ?? value;
+          }
+          if (errors.description?.hasError) {
+            runValidationTasks("description", value);
+          }
+          setDescription(value);
+        }}
+        onBlur={() => runValidationTasks("description", description)}
+        errorMessage={errors.description?.errorMessage}
+        hasError={errors.description?.hasError}
+        {...getOverrideProps(overrides, "description")}
+      ></TextField>
       <SelectField
-        label="Platform"
+        label="Status"
         placeholder="Please select an option"
         isDisabled={false}
-        value={platform}
+        value={status}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              platform: value,
-              latestVersion,
-              createdAt,
+              userID,
+              subject,
+              description,
+              status: value,
             };
             const result = onChange(modelFields);
-            value = result?.platform ?? value;
+            value = result?.status ?? value;
           }
-          if (errors.platform?.hasError) {
-            runValidationTasks("platform", value);
+          if (errors.status?.hasError) {
+            runValidationTasks("status", value);
           }
-          setPlatform(value);
+          setStatus(value);
         }}
-        onBlur={() => runValidationTasks("platform", platform)}
-        errorMessage={errors.platform?.errorMessage}
-        hasError={errors.platform?.hasError}
-        {...getOverrideProps(overrides, "platform")}
+        onBlur={() => runValidationTasks("status", status)}
+        errorMessage={errors.status?.errorMessage}
+        hasError={errors.status?.hasError}
+        {...getOverrideProps(overrides, "status")}
       >
         <option
-          children="Ios"
-          value="IOS"
-          {...getOverrideProps(overrides, "platformoption0")}
+          children="Pending"
+          value="PENDING"
+          {...getOverrideProps(overrides, "statusoption0")}
         ></option>
         <option
-          children="Android"
-          value="ANDROID"
-          {...getOverrideProps(overrides, "platformoption1")}
+          children="Resolved"
+          value="RESOLVED"
+          {...getOverrideProps(overrides, "statusoption1")}
         ></option>
       </SelectField>
-      <TextField
-        label="Latest version"
-        isRequired={true}
-        isReadOnly={false}
-        value={latestVersion}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              platform,
-              latestVersion: value,
-              createdAt,
-            };
-            const result = onChange(modelFields);
-            value = result?.latestVersion ?? value;
-          }
-          if (errors.latestVersion?.hasError) {
-            runValidationTasks("latestVersion", value);
-          }
-          setLatestVersion(value);
-        }}
-        onBlur={() => runValidationTasks("latestVersion", latestVersion)}
-        errorMessage={errors.latestVersion?.errorMessage}
-        hasError={errors.latestVersion?.hasError}
-        {...getOverrideProps(overrides, "latestVersion")}
-      ></TextField>
-      <TextField
-        label="Created at"
-        isRequired={true}
-        isReadOnly={false}
-        value={createdAt}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              platform,
-              latestVersion,
-              createdAt: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.createdAt ?? value;
-          }
-          if (errors.createdAt?.hasError) {
-            runValidationTasks("createdAt", value);
-          }
-          setCreatedAt(value);
-        }}
-        onBlur={() => runValidationTasks("createdAt", createdAt)}
-        errorMessage={errors.createdAt?.errorMessage}
-        hasError={errors.createdAt?.hasError}
-        {...getOverrideProps(overrides, "createdAt")}
-      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
@@ -252,7 +285,7 @@ export default function AppVersionHistoryUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || appVersionHistoryModelProp)}
+          isDisabled={!(idProp || reportsModelProp)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -264,7 +297,7 @@ export default function AppVersionHistoryUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(idProp || appVersionHistoryModelProp) ||
+              !(idProp || reportsModelProp) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}

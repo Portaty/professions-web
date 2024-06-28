@@ -1,12 +1,26 @@
 import Navbar from "@/components/Navbar";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import styles from "../../styles/Notifications.module.css";
 import { Button } from "@mui/material";
 
 const Notifications = () => {
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [titleError, setTitleError] = useState(false);
+  const [messageError, setMessageError] = useState(false);
+
   const sendNotification = async () => {
+    if (!title || !message) {
+      setTitleError(!title);
+      setMessageError(!message);
+      return;
+    } else {
+      setTitleError(false);
+      setMessageError(false);
+    }
+
     try {
       const response = await fetch("/api/sendNotifications", {
         method: "POST",
@@ -14,21 +28,19 @@ const Notifications = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: "Bienvenidos a Portaty",
-          message: "Portaty es tu Guia Local",
+          title: title,
+          message: message,
         }),
       });
 
       const data = await response.json();
       console.log(data);
+      setTitle("");
+      setMessage("");
     } catch (error) {
       console.error("Error al enviar la notificación:", error);
     }
   };
-
-  useEffect(() => {
-    sendNotification();
-  }, []);
 
   return (
     <div className={styles.notifications}>
@@ -46,12 +58,23 @@ const Notifications = () => {
           autoComplete="off"
         >
           <div className={styles.boxes}>
-            <TextField id="outlined-multiline-flexible" label="Titulo" />
+            <TextField
+              id="outlined-multiline-flexible"
+              label="Titulo"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              error={titleError}
+              helperText={titleError ? "El título es obligatorio" : ""}
+            />
             <TextField
               id="outlined-multiline-static"
               label="Contenido"
               multiline
               rows={5}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              error={messageError}
+              helperText={messageError ? "El contenido es obligatorio" : ""}
             />
             <Button
               fullWidth
@@ -66,8 +89,9 @@ const Notifications = () => {
                   backgroundColor: "#1f1f1f",
                 },
               }}
+              onClick={sendNotification}
             >
-              Enviar notificacion
+              Enviar notificación
             </Button>
           </div>
         </Box>

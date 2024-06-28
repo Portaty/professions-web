@@ -20,10 +20,9 @@ import {
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Business } from "../models";
-import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
+import { API } from "aws-amplify";
+import { createBusiness } from "../graphql/mutations";
 function ArrayField({
   items = [],
   onChange,
@@ -36,6 +35,7 @@ function ArrayField({
   defaultFieldValue,
   lengthLimit,
   getBadgeText,
+  runValidationTasks,
   errorMessage,
 }) {
   const labelElement = <Text>{label}</Text>;
@@ -59,6 +59,7 @@ function ArrayField({
     setSelectedBadgeIndex(undefined);
   };
   const addItem = async () => {
+    const { hasError } = runValidationTasks();
     if (
       currentFieldValue !== undefined &&
       currentFieldValue !== null &&
@@ -168,12 +169,7 @@ function ArrayField({
               }}
             ></Button>
           )}
-          <Button
-            size="small"
-            variation="link"
-            isDisabled={hasError}
-            onClick={addItem}
-          >
+          <Button size="small" variation="link" onClick={addItem}>
             {selectedBadgeIndex !== undefined ? "Save" : "Add"}
           </Button>
         </Flex>
@@ -210,6 +206,8 @@ export default function BusinessCreateForm(props) {
     tags: [],
     description: "",
     prefer: false,
+    schedule: "",
+    catalogpdf: "",
   };
   const [status, setStatus] = React.useState(initialValues.status);
   const [identityID, setIdentityID] = React.useState(initialValues.identityID);
@@ -229,6 +227,8 @@ export default function BusinessCreateForm(props) {
     initialValues.description
   );
   const [prefer, setPrefer] = React.useState(initialValues.prefer);
+  const [schedule, setSchedule] = React.useState(initialValues.schedule);
+  const [catalogpdf, setCatalogpdf] = React.useState(initialValues.catalogpdf);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setStatus(initialValues.status);
@@ -249,6 +249,8 @@ export default function BusinessCreateForm(props) {
     setCurrentTagsValue("");
     setDescription(initialValues.description);
     setPrefer(initialValues.prefer);
+    setSchedule(initialValues.schedule);
+    setCatalogpdf(initialValues.catalogpdf);
     setErrors({});
   };
   const [currentImagesValue, setCurrentImagesValue] = React.useState("");
@@ -272,6 +274,8 @@ export default function BusinessCreateForm(props) {
     tags: [],
     description: [],
     prefer: [],
+    schedule: [],
+    catalogpdf: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -315,6 +319,8 @@ export default function BusinessCreateForm(props) {
           tags,
           description,
           prefer,
+          schedule,
+          catalogpdf,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -340,11 +346,18 @@ export default function BusinessCreateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value.trim() === "") {
-              modelFields[key] = undefined;
+            if (typeof value === "string" && value === "") {
+              modelFields[key] = null;
             }
           });
-          await DataStore.save(new Business(modelFields));
+          await API.graphql({
+            query: createBusiness.replaceAll("__typename", ""),
+            variables: {
+              input: {
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -353,7 +366,8 @@ export default function BusinessCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}
@@ -385,6 +399,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -440,6 +456,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.identityID ?? value;
@@ -479,6 +497,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -518,6 +538,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.image ?? value;
@@ -553,6 +575,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             values = result?.images ?? values;
@@ -564,6 +588,9 @@ export default function BusinessCreateForm(props) {
         label={"Images"}
         items={images}
         hasError={errors?.images?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("images", currentImagesValue)
+        }
         errorMessage={errors?.images?.errorMessage}
         setFieldValue={setCurrentImagesValue}
         inputFieldRef={imagesRef}
@@ -614,6 +641,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.thumbnail ?? value;
@@ -653,6 +682,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.email ?? value;
@@ -692,6 +723,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.phone ?? value;
@@ -731,6 +764,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.whatsapp ?? value;
@@ -770,6 +805,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.instagram ?? value;
@@ -809,6 +846,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.facebook ?? value;
@@ -848,6 +887,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.page ?? value;
@@ -887,6 +928,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.activity ?? value;
@@ -922,6 +965,8 @@ export default function BusinessCreateForm(props) {
               tags: values,
               description,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             values = result?.tags ?? values;
@@ -933,6 +978,9 @@ export default function BusinessCreateForm(props) {
         label={"Tags"}
         items={tags}
         hasError={errors?.tags?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("tags", currentTagsValue)
+        }
         errorMessage={errors?.tags?.errorMessage}
         setFieldValue={setCurrentTagsValue}
         inputFieldRef={tagsRef}
@@ -983,6 +1031,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description: value,
               prefer,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -1022,6 +1072,8 @@ export default function BusinessCreateForm(props) {
               tags,
               description,
               prefer: value,
+              schedule,
+              catalogpdf,
             };
             const result = onChange(modelFields);
             value = result?.prefer ?? value;
@@ -1036,6 +1088,88 @@ export default function BusinessCreateForm(props) {
         hasError={errors.prefer?.hasError}
         {...getOverrideProps(overrides, "prefer")}
       ></SwitchField>
+      <TextField
+        label="Schedule"
+        isRequired={false}
+        isReadOnly={false}
+        value={schedule}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              status,
+              identityID,
+              name,
+              image,
+              images,
+              thumbnail,
+              email,
+              phone,
+              whatsapp,
+              instagram,
+              facebook,
+              page,
+              activity,
+              tags,
+              description,
+              prefer,
+              schedule: value,
+              catalogpdf,
+            };
+            const result = onChange(modelFields);
+            value = result?.schedule ?? value;
+          }
+          if (errors.schedule?.hasError) {
+            runValidationTasks("schedule", value);
+          }
+          setSchedule(value);
+        }}
+        onBlur={() => runValidationTasks("schedule", schedule)}
+        errorMessage={errors.schedule?.errorMessage}
+        hasError={errors.schedule?.hasError}
+        {...getOverrideProps(overrides, "schedule")}
+      ></TextField>
+      <TextField
+        label="Catalogpdf"
+        isRequired={false}
+        isReadOnly={false}
+        value={catalogpdf}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              status,
+              identityID,
+              name,
+              image,
+              images,
+              thumbnail,
+              email,
+              phone,
+              whatsapp,
+              instagram,
+              facebook,
+              page,
+              activity,
+              tags,
+              description,
+              prefer,
+              schedule,
+              catalogpdf: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.catalogpdf ?? value;
+          }
+          if (errors.catalogpdf?.hasError) {
+            runValidationTasks("catalogpdf", value);
+          }
+          setCatalogpdf(value);
+        }}
+        onBlur={() => runValidationTasks("catalogpdf", catalogpdf)}
+        errorMessage={errors.catalogpdf?.errorMessage}
+        hasError={errors.catalogpdf?.hasError}
+        {...getOverrideProps(overrides, "catalogpdf")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

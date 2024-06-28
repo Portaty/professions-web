@@ -13,10 +13,10 @@ import {
   SelectField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Logs } from "../models";
-import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
+import { API } from "aws-amplify";
+import { getLogs } from "../graphql/queries";
+import { updateLogs } from "../graphql/mutations";
 export default function LogsUpdateForm(props) {
   const {
     id: idProp,
@@ -63,7 +63,12 @@ export default function LogsUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? await DataStore.query(Logs, idProp)
+        ? (
+            await API.graphql({
+              query: getLogs.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getLogs
         : logsModelProp;
       setLogsRecord(record);
     };
@@ -106,12 +111,12 @@ export default function LogsUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           userID,
-          type,
-          text,
-          businessID,
-          posI,
-          posE,
-          name,
+          type: type ?? null,
+          text: text ?? null,
+          businessID: businessID ?? null,
+          posI: posI ?? null,
+          posE: posE ?? null,
+          name: name ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -137,21 +142,26 @@ export default function LogsUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value.trim() === "") {
-              modelFields[key] = undefined;
+            if (typeof value === "string" && value === "") {
+              modelFields[key] = null;
             }
           });
-          await DataStore.save(
-            Logs.copyOf(logsRecord, (updated) => {
-              Object.assign(updated, modelFields);
-            })
-          );
+          await API.graphql({
+            query: updateLogs.replaceAll("__typename", ""),
+            variables: {
+              input: {
+                id: logsRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}
