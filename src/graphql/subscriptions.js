@@ -11,6 +11,7 @@ export const onCreateAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -24,6 +25,7 @@ export const onUpdateAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -37,6 +39,91 @@ export const onDeleteAppVersionHistory = /* GraphQL */ `
       latestVersion
       createdAt
       updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateReports = /* GraphQL */ `
+  subscription OnCreateReports($filter: ModelSubscriptionReportsFilterInput) {
+    onCreateReports(filter: $filter) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateReports = /* GraphQL */ `
+  subscription OnUpdateReports($filter: ModelSubscriptionReportsFilterInput) {
+    onUpdateReports(filter: $filter) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteReports = /* GraphQL */ `
+  subscription OnDeleteReports($filter: ModelSubscriptionReportsFilterInput) {
+    onDeleteReports(filter: $filter) {
+      id
+      userID
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateNotificationHistory = /* GraphQL */ `
+  subscription OnCreateNotificationHistory(
+    $filter: ModelSubscriptionNotificationHistoryFilterInput
+  ) {
+    onCreateNotificationHistory(filter: $filter) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateNotificationHistory = /* GraphQL */ `
+  subscription OnUpdateNotificationHistory(
+    $filter: ModelSubscriptionNotificationHistoryFilterInput
+  ) {
+    onUpdateNotificationHistory(filter: $filter) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteNotificationHistory = /* GraphQL */ `
+  subscription OnDeleteNotificationHistory(
+    $filter: ModelSubscriptionNotificationHistoryFilterInput
+  ) {
+    onDeleteNotificationHistory(filter: $filter) {
+      id
+      title
+      message
+      createdAt
+      updatedAt
+      __typename
     }
   }
 `;
@@ -47,9 +134,11 @@ export const onCreateArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -60,9 +149,11 @@ export const onUpdateArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -73,9 +164,11 @@ export const onDeleteArea = /* GraphQL */ `
       name
       activities {
         nextToken
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -90,9 +183,11 @@ export const onCreateActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -107,9 +202,11 @@ export const onUpdateActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -124,9 +221,11 @@ export const onDeleteActivity = /* GraphQL */ `
         name
         createdAt
         updatedAt
+        __typename
       }
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -146,13 +245,20 @@ export const onCreateUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -172,13 +278,20 @@ export const onUpdateUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -198,13 +311,20 @@ export const onDeleteUsers = /* GraphQL */ `
       notificationToken
       favorites {
         nextToken
+        __typename
       }
       business {
         nextToken
+        __typename
+      }
+      comments {
+        nextToken
+        __typename
       }
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -228,6 +348,7 @@ export const onCreateBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -244,17 +365,26 @@ export const onCreateBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -278,6 +408,7 @@ export const onUpdateBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -294,17 +425,26 @@ export const onUpdateBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -328,6 +468,7 @@ export const onDeleteBusiness = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       status
       identityID
@@ -344,17 +485,122 @@ export const onDeleteBusiness = /* GraphQL */ `
       coordinates {
         lat
         lon
+        __typename
       }
       activity
       tags
       favorites {
         nextToken
+        __typename
       }
       description
       prefer
+      schedule
+      comments {
+        nextToken
+        __typename
+      }
+      catalogpdf
       createdAt
       updatedAt
       owner
+      __typename
+    }
+  }
+`;
+export const onCreateBusinessComment = /* GraphQL */ `
+  subscription OnCreateBusinessComment(
+    $filter: ModelSubscriptionBusinessCommentFilterInput
+    $owner: String
+  ) {
+    onCreateBusinessComment(filter: $filter, owner: $owner) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const onUpdateBusinessComment = /* GraphQL */ `
+  subscription OnUpdateBusinessComment(
+    $filter: ModelSubscriptionBusinessCommentFilterInput
+    $owner: String
+  ) {
+    onUpdateBusinessComment(filter: $filter, owner: $owner) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
+export const onDeleteBusinessComment = /* GraphQL */ `
+  subscription OnDeleteBusinessComment(
+    $filter: ModelSubscriptionBusinessCommentFilterInput
+    $owner: String
+  ) {
+    onDeleteBusinessComment(filter: $filter, owner: $owner) {
+      id
+      userID
+      user {
+        id
+        cognitoID
+        name
+        lastName
+        email
+        identityID
+        gender
+        notificationToken
+        owner
+        createdAt
+        updatedAt
+        __typename
+      }
+      businessID
+      stars
+      description
+      createdAt
+      updatedAt
+      owner
+      __typename
     }
   }
 `;
@@ -385,9 +631,12 @@ export const onCreateFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -402,11 +651,13 @@ export const onCreateFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -437,9 +688,12 @@ export const onUpdateFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -454,11 +708,13 @@ export const onUpdateFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -489,9 +745,12 @@ export const onDeleteFavorites = /* GraphQL */ `
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner
+        __typename
       }
       userID
       user {
@@ -506,11 +765,13 @@ export const onDeleteFavorites = /* GraphQL */ `
         owner
         createdAt
         updatedAt
+        __typename
       }
       position
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -524,18 +785,12 @@ export const onCreateComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -549,18 +804,12 @@ export const onUpdateComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -574,18 +823,12 @@ export const onDeleteComplaints = /* GraphQL */ `
       userID
       businessID
       status
-      reasonID
-      reason {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
+      reason
       description
       owner
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -600,6 +843,7 @@ export const onCreateReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -614,6 +858,7 @@ export const onUpdateReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -628,6 +873,7 @@ export const onDeleteReasonComplaints = /* GraphQL */ `
       createdAt
       updatedAt
       owner
+      __typename
     }
   }
 `;
@@ -644,6 +890,7 @@ export const onCreateLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -660,6 +907,7 @@ export const onUpdateLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -676,6 +924,7 @@ export const onDeleteLogs = /* GraphQL */ `
       name
       createdAt
       updatedAt
+      __typename
     }
   }
 `;

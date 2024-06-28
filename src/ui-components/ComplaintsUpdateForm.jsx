@@ -15,10 +15,12 @@ import {
 } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { createLogs } from "../graphql/mutations";
-export default function LogsCreateForm(props) {
+import { getComplaints } from "../graphql/queries";
+import { updateComplaints } from "../graphql/mutations";
+export default function ComplaintsUpdateForm(props) {
   const {
-    clearOnSuccess = true,
+    id: idProp,
+    complaints: complaintsModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -29,39 +31,57 @@ export default function LogsCreateForm(props) {
   } = props;
   const initialValues = {
     userID: "",
-    type: "",
-    text: "",
     businessID: "",
-    posI: "",
-    posE: "",
-    name: "",
+    status: "",
+    reason: "",
+    description: "",
+    owner: "",
   };
   const [userID, setUserID] = React.useState(initialValues.userID);
-  const [type, setType] = React.useState(initialValues.type);
-  const [text, setText] = React.useState(initialValues.text);
   const [businessID, setBusinessID] = React.useState(initialValues.businessID);
-  const [posI, setPosI] = React.useState(initialValues.posI);
-  const [posE, setPosE] = React.useState(initialValues.posE);
-  const [name, setName] = React.useState(initialValues.name);
+  const [status, setStatus] = React.useState(initialValues.status);
+  const [reason, setReason] = React.useState(initialValues.reason);
+  const [description, setDescription] = React.useState(
+    initialValues.description
+  );
+  const [owner, setOwner] = React.useState(initialValues.owner);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setUserID(initialValues.userID);
-    setType(initialValues.type);
-    setText(initialValues.text);
-    setBusinessID(initialValues.businessID);
-    setPosI(initialValues.posI);
-    setPosE(initialValues.posE);
-    setName(initialValues.name);
+    const cleanValues = complaintsRecord
+      ? { ...initialValues, ...complaintsRecord }
+      : initialValues;
+    setUserID(cleanValues.userID);
+    setBusinessID(cleanValues.businessID);
+    setStatus(cleanValues.status);
+    setReason(cleanValues.reason);
+    setDescription(cleanValues.description);
+    setOwner(cleanValues.owner);
     setErrors({});
   };
+  const [complaintsRecord, setComplaintsRecord] =
+    React.useState(complaintsModelProp);
+  React.useEffect(() => {
+    const queryData = async () => {
+      const record = idProp
+        ? (
+            await API.graphql({
+              query: getComplaints.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getComplaints
+        : complaintsModelProp;
+      setComplaintsRecord(record);
+    };
+    queryData();
+  }, [idProp, complaintsModelProp]);
+  React.useEffect(resetStateValues, [complaintsRecord]);
   const validations = {
     userID: [{ type: "Required" }],
-    type: [],
-    text: [],
-    businessID: [],
-    posI: [],
-    posE: [],
-    name: [],
+    businessID: [{ type: "Required" }],
+    status: [{ type: "Required" }],
+    reason: [{ type: "Required" }],
+    description: [],
+    owner: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -90,12 +110,11 @@ export default function LogsCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           userID,
-          type,
-          text,
           businessID,
-          posI,
-          posE,
-          name,
+          status,
+          reason,
+          description: description ?? null,
+          owner: owner ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -126,18 +145,16 @@ export default function LogsCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createLogs.replaceAll("__typename", ""),
+            query: updateComplaints.replaceAll("__typename", ""),
             variables: {
               input: {
+                id: complaintsRecord.id,
                 ...modelFields,
               },
             },
           });
           if (onSuccess) {
             onSuccess(modelFields);
-          }
-          if (clearOnSuccess) {
-            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -146,7 +163,7 @@ export default function LogsCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "LogsCreateForm")}
+      {...getOverrideProps(overrides, "ComplaintsUpdateForm")}
       {...rest}
     >
       <TextField
@@ -159,12 +176,11 @@ export default function LogsCreateForm(props) {
           if (onChange) {
             const modelFields = {
               userID: value,
-              type,
-              text,
               businessID,
-              posI,
-              posE,
-              name,
+              status,
+              reason,
+              description,
+              owner,
             };
             const result = onChange(modelFields);
             value = result?.userID ?? value;
@@ -179,80 +195,9 @@ export default function LogsCreateForm(props) {
         hasError={errors.userID?.hasError}
         {...getOverrideProps(overrides, "userID")}
       ></TextField>
-      <SelectField
-        label="Type"
-        placeholder="Please select an option"
-        isDisabled={false}
-        value={type}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              userID,
-              type: value,
-              text,
-              businessID,
-              posI,
-              posE,
-              name,
-            };
-            const result = onChange(modelFields);
-            value = result?.type ?? value;
-          }
-          if (errors.type?.hasError) {
-            runValidationTasks("type", value);
-          }
-          setType(value);
-        }}
-        onBlur={() => runValidationTasks("type", type)}
-        errorMessage={errors.type?.errorMessage}
-        hasError={errors.type?.hasError}
-        {...getOverrideProps(overrides, "type")}
-      >
-        <option
-          children="Search"
-          value="SEARCH"
-          {...getOverrideProps(overrides, "typeoption0")}
-        ></option>
-        <option
-          children="Business view"
-          value="BUSINESS_VIEW"
-          {...getOverrideProps(overrides, "typeoption1")}
-        ></option>
-      </SelectField>
-      <TextField
-        label="Text"
-        isRequired={false}
-        isReadOnly={false}
-        value={text}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              userID,
-              type,
-              text: value,
-              businessID,
-              posI,
-              posE,
-              name,
-            };
-            const result = onChange(modelFields);
-            value = result?.text ?? value;
-          }
-          if (errors.text?.hasError) {
-            runValidationTasks("text", value);
-          }
-          setText(value);
-        }}
-        onBlur={() => runValidationTasks("text", text)}
-        errorMessage={errors.text?.errorMessage}
-        hasError={errors.text?.hasError}
-        {...getOverrideProps(overrides, "text")}
-      ></TextField>
       <TextField
         label="Business id"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={businessID}
         onChange={(e) => {
@@ -260,12 +205,11 @@ export default function LogsCreateForm(props) {
           if (onChange) {
             const modelFields = {
               userID,
-              type,
-              text,
               businessID: value,
-              posI,
-              posE,
-              name,
+              status,
+              reason,
+              description,
+              owner,
             };
             const result = onChange(modelFields);
             value = result?.businessID ?? value;
@@ -280,116 +224,146 @@ export default function LogsCreateForm(props) {
         hasError={errors.businessID?.hasError}
         {...getOverrideProps(overrides, "businessID")}
       ></TextField>
-      <TextField
-        label="Pos i"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={posI}
-        onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              userID,
-              type,
-              text,
-              businessID,
-              posI: value,
-              posE,
-              name,
-            };
-            const result = onChange(modelFields);
-            value = result?.posI ?? value;
-          }
-          if (errors.posI?.hasError) {
-            runValidationTasks("posI", value);
-          }
-          setPosI(value);
-        }}
-        onBlur={() => runValidationTasks("posI", posI)}
-        errorMessage={errors.posI?.errorMessage}
-        hasError={errors.posI?.hasError}
-        {...getOverrideProps(overrides, "posI")}
-      ></TextField>
-      <TextField
-        label="Pos e"
-        isRequired={false}
-        isReadOnly={false}
-        type="number"
-        step="any"
-        value={posE}
-        onChange={(e) => {
-          let value = isNaN(parseInt(e.target.value))
-            ? e.target.value
-            : parseInt(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              userID,
-              type,
-              text,
-              businessID,
-              posI,
-              posE: value,
-              name,
-            };
-            const result = onChange(modelFields);
-            value = result?.posE ?? value;
-          }
-          if (errors.posE?.hasError) {
-            runValidationTasks("posE", value);
-          }
-          setPosE(value);
-        }}
-        onBlur={() => runValidationTasks("posE", posE)}
-        errorMessage={errors.posE?.errorMessage}
-        hasError={errors.posE?.hasError}
-        {...getOverrideProps(overrides, "posE")}
-      ></TextField>
-      <TextField
-        label="Name"
-        isRequired={false}
-        isReadOnly={false}
-        value={name}
+      <SelectField
+        label="Status"
+        placeholder="Please select an option"
+        isDisabled={false}
+        value={status}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               userID,
-              type,
-              text,
               businessID,
-              posI,
-              posE,
-              name: value,
+              status: value,
+              reason,
+              description,
+              owner,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.status ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.status?.hasError) {
+            runValidationTasks("status", value);
           }
-          setName(value);
+          setStatus(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("status", status)}
+        errorMessage={errors.status?.errorMessage}
+        hasError={errors.status?.hasError}
+        {...getOverrideProps(overrides, "status")}
+      >
+        <option
+          children="Pending"
+          value="PENDING"
+          {...getOverrideProps(overrides, "statusoption0")}
+        ></option>
+        <option
+          children="Resolved"
+          value="RESOLVED"
+          {...getOverrideProps(overrides, "statusoption1")}
+        ></option>
+      </SelectField>
+      <TextField
+        label="Reason"
+        isRequired={true}
+        isReadOnly={false}
+        value={reason}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID,
+              businessID,
+              status,
+              reason: value,
+              description,
+              owner,
+            };
+            const result = onChange(modelFields);
+            value = result?.reason ?? value;
+          }
+          if (errors.reason?.hasError) {
+            runValidationTasks("reason", value);
+          }
+          setReason(value);
+        }}
+        onBlur={() => runValidationTasks("reason", reason)}
+        errorMessage={errors.reason?.errorMessage}
+        hasError={errors.reason?.hasError}
+        {...getOverrideProps(overrides, "reason")}
+      ></TextField>
+      <TextField
+        label="Description"
+        isRequired={false}
+        isReadOnly={false}
+        value={description}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID,
+              businessID,
+              status,
+              reason,
+              description: value,
+              owner,
+            };
+            const result = onChange(modelFields);
+            value = result?.description ?? value;
+          }
+          if (errors.description?.hasError) {
+            runValidationTasks("description", value);
+          }
+          setDescription(value);
+        }}
+        onBlur={() => runValidationTasks("description", description)}
+        errorMessage={errors.description?.errorMessage}
+        hasError={errors.description?.hasError}
+        {...getOverrideProps(overrides, "description")}
+      ></TextField>
+      <TextField
+        label="Owner"
+        isRequired={false}
+        isReadOnly={false}
+        value={owner}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              userID,
+              businessID,
+              status,
+              reason,
+              description,
+              owner: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.owner ?? value;
+          }
+          if (errors.owner?.hasError) {
+            runValidationTasks("owner", value);
+          }
+          setOwner(value);
+        }}
+        onBlur={() => runValidationTasks("owner", owner)}
+        errorMessage={errors.owner?.errorMessage}
+        hasError={errors.owner?.hasError}
+        {...getOverrideProps(overrides, "owner")}
       ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Clear"
+          children="Reset"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          {...getOverrideProps(overrides, "ClearButton")}
+          isDisabled={!(idProp || complaintsModelProp)}
+          {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -399,7 +373,10 @@ export default function LogsCreateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={Object.values(errors).some((e) => e?.hasError)}
+            isDisabled={
+              !(idProp || complaintsModelProp) ||
+              Object.values(errors).some((e) => e?.hasError)
+            }
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>
