@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import styles from "../../styles/Notifications.module.css";
 import { Button } from "@mui/material";
+import TableNotification from "@/components/TableNotification";
 
 const Notifications = () => {
   const [title, setTitle] = useState("");
@@ -47,7 +48,6 @@ const Notifications = () => {
       <Navbar />
       <div className={styles.content}>
         <h1>Envia una notificacion a todos nuestros usuarios registrados</h1>
-
         <Box
           component="form"
           sx={{
@@ -95,6 +95,11 @@ const Notifications = () => {
             </Button>
           </div>
         </Box>
+        <h2 style={{
+          marginTop: 40
+        }}>Historial de notificaciones</h2>
+
+        <TableNotification />
       </div>
     </div>
   );

@@ -20,10 +20,10 @@ import {
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
-import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { API } from "aws-amplify";
-import { getBusiness } from "../graphql/queries";
-import { updateBusiness } from "../graphql/mutations";
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { Business } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
 function ArrayField({
   items = [],
   onChange,
@@ -36,7 +36,6 @@ function ArrayField({
   defaultFieldValue,
   lengthLimit,
   getBadgeText,
-  runValidationTasks,
   errorMessage,
 }) {
   const labelElement = <Text>{label}</Text>;
@@ -60,7 +59,6 @@ function ArrayField({
     setSelectedBadgeIndex(undefined);
   };
   const addItem = async () => {
-    const { hasError } = runValidationTasks();
     if (
       currentFieldValue !== undefined &&
       currentFieldValue !== null &&
@@ -170,7 +168,12 @@ function ArrayField({
               }}
             ></Button>
           )}
-          <Button size="small" variation="link" onClick={addItem}>
+          <Button
+            size="small"
+            variation="link"
+            isDisabled={hasError}
+            onClick={addItem}
+          >
             {selectedBadgeIndex !== undefined ? "Save" : "Add"}
           </Button>
         </Flex>
@@ -262,12 +265,7 @@ export default function BusinessUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? (
-            await API.graphql({
-              query: getBusiness.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getBusiness
+        ? await DataStore.query(Business, idProp)
         : businessModelProp;
       setBusinessRecord(record);
     };
@@ -324,24 +322,24 @@ export default function BusinessUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          status: status ?? null,
-          identityID: identityID ?? null,
-          name: name ?? null,
-          image: image ?? null,
-          images: images ?? null,
-          thumbnail: thumbnail ?? null,
-          email: email ?? null,
-          phone: phone ?? null,
-          whatsapp: whatsapp ?? null,
-          instagram: instagram ?? null,
-          facebook: facebook ?? null,
-          page: page ?? null,
-          activity: activity ?? null,
-          tags: tags ?? null,
-          description: description ?? null,
-          prefer: prefer ?? null,
-          schedule: schedule ?? null,
-          catalogpdf: catalogpdf ?? null,
+          status,
+          identityID,
+          name,
+          image,
+          images,
+          thumbnail,
+          email,
+          phone,
+          whatsapp,
+          instagram,
+          facebook,
+          page,
+          activity,
+          tags,
+          description,
+          prefer,
+          schedule,
+          catalogpdf,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -367,26 +365,21 @@ export default function BusinessUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value === "") {
-              modelFields[key] = null;
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
             }
           });
-          await API.graphql({
-            query: updateBusiness.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                id: businessRecord.id,
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(
+            Business.copyOf(businessRecord, (updated) => {
+              Object.assign(updated, modelFields);
+            })
+          );
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}
@@ -612,9 +605,6 @@ export default function BusinessUpdateForm(props) {
         label={"Images"}
         items={images}
         hasError={errors?.images?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("images", currentImagesValue)
-        }
         errorMessage={errors?.images?.errorMessage}
         setFieldValue={setCurrentImagesValue}
         inputFieldRef={imagesRef}
@@ -1002,9 +992,6 @@ export default function BusinessUpdateForm(props) {
         label={"Tags"}
         items={tags}
         hasError={errors?.tags?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("tags", currentTagsValue)
-        }
         errorMessage={errors?.tags?.errorMessage}
         setFieldValue={setCurrentTagsValue}
         inputFieldRef={tagsRef}

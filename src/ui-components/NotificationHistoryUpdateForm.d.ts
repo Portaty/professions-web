@@ -6,16 +6,8 @@
 
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
-export declare type EscapeHatchProps = {
-    [elementHierarchy: string]: Record<string, unknown>;
-} | null;
-export declare type VariantValues = {
-    [key: string]: string;
-};
-export declare type Variant = {
-    variantValues: VariantValues;
-    overrides: EscapeHatchProps;
-};
+import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+import { NotificationHistory } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -39,7 +31,7 @@ export declare type NotificationHistoryUpdateFormProps = React.PropsWithChildren
     overrides?: NotificationHistoryUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    notificationHistory?: any;
+    notificationHistory?: NotificationHistory;
     onSubmit?: (fields: NotificationHistoryUpdateFormInputValues) => NotificationHistoryUpdateFormInputValues;
     onSuccess?: (fields: NotificationHistoryUpdateFormInputValues) => void;
     onError?: (fields: NotificationHistoryUpdateFormInputValues, errorMessage: string) => void;

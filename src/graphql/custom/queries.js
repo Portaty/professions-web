@@ -95,3 +95,28 @@ export const listBusinessbyUserID = /* GraphQL */ `
     }
   }
 `;
+
+export const listNotificationHistories = /* GraphQL */ `
+  query ListNotificationHistories(
+    $filter: ModelNotificationHistoryFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listNotificationHistories(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        title
+        message
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
