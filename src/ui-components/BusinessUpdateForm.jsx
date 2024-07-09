@@ -449,6 +449,11 @@ export default function BusinessUpdateForm(props) {
           value="SUSPENDED"
           {...getOverrideProps(overrides, "statusoption2")}
         ></option>
+        <option
+          children="Deleted"
+          value="DELETED"
+          {...getOverrideProps(overrides, "statusoption3")}
+        ></option>
       </SelectField>
       <TextField
         label="Identity id"
