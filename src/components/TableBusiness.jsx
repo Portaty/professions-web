@@ -21,6 +21,29 @@ const TableBusiness = () => {
   const [data, setData] = useState([]);
   const [table, setTable] = useState([]);
   const [selectedInfo, setSelectedInfo] = useState(1);
+
+  const formattedRows = (datos) => {
+    let nuevosDatos = [];
+    datos.map((item) => {
+      const fechaActual = new Date(item.createdAt);
+      const opciones = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "America/Caracas",
+      };
+      const fechaFormateada = fechaActual.toLocaleDateString("es-VE", opciones);
+      let act = JSON.parse(item.activity);
+      return nuevosDatos.push({
+        ...item,
+        activity: act.sub,
+        area: act.main,
+        date: fechaFormateada,
+      });
+    });
+    setTable(nuevosDatos);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 150 },
     {
@@ -46,40 +69,18 @@ const TableBusiness = () => {
       headerName: "Area",
       width: 200,
       editable: true,
-      renderCell: (params) => {
-        let act = JSON.parse(params.row.activity);
-        return <div>{act.main}</div>;
-      },
     },
     {
       field: "activity",
       headerName: "Actividad",
       width: 200,
       editable: true,
-      renderCell: (params) => {
-        let act = JSON.parse(params.row.activity);
-        return <div>{act.sub}</div>;
-      },
     },
     {
       field: "date",
       headerName: "Fecha de registro",
       width: 200,
       editable: true,
-      renderCell: (params) => {
-        const fechaActual = new Date(params.row.createdAt);
-        const opciones = {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          timeZone: "America/Caracas",
-        };
-        const fechaFormateada = fechaActual.toLocaleDateString(
-          "es-VE",
-          opciones
-        );
-        return <div>{fechaFormateada}</div>;
-      },
     },
     {
       field: "thumbnail",
@@ -199,6 +200,7 @@ const TableBusiness = () => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
       setTable(datosOrdenados);
+      formattedRows(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
