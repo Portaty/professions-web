@@ -40,10 +40,16 @@ export const listBusinesses = /* GraphQL */ `
         instagram
         facebook
         page
+        coordinates {
+          lat
+          lon
+        }
         activity
         tags
         description
         prefer
+        schedule
+        catalogpdf
         createdAt
         updatedAt
         owner

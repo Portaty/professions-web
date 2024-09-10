@@ -16,10 +16,12 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { esES } from "@mui/material/locale";
 import { cards } from "@/constants/cards";
 import Link from "next/link";
+import MultipleSelect from "./MultipleSelect";
 
 const TableBusiness = () => {
   const [data, setData] = useState([]);
   const [table, setTable] = useState([]);
+  const [selectCountry, setSelectCountry] = useState(`Todos`);
   const [selectedInfo, setSelectedInfo] = useState(1);
 
   const formattedRows = (datos) => {
@@ -65,6 +67,12 @@ const TableBusiness = () => {
       editable: true,
     },
     {
+      field: "country",
+      headerName: "Pais",
+      width: 150,
+      editable: true,
+    },
+    {
       field: "area",
       headerName: "Area",
       width: 200,
@@ -73,6 +81,12 @@ const TableBusiness = () => {
     {
       field: "activity",
       headerName: "Actividad",
+      width: 200,
+      editable: true,
+    },
+    {
+      field: "favorites",
+      headerName: "N de Favoritos",
       width: 200,
       editable: true,
     },
@@ -100,26 +114,40 @@ const TableBusiness = () => {
   ];
   const fetchData = async () => {
     try {
-      const fetchAll = async (nextToken, result = []) => {
-        const response = await API.graphql({
-          query: queries.listBusinesses,
-          authMode: "AMAZON_COGNITO_USER_POOLS",
-          variables: {
-            nextToken,
+      const fetchAll = async (from = 0, result = []) => {
+        let fetchPage = from;
+        const path = "/api/totalFilterbyCountry";
+        const params = {
+          headers: {},
+          queryStringParameters: {
+            country: selectCountry === "Todos" ? "" : selectCountry,
+            fromTo: fetchPage,
+            limit: 50,
           },
-        });
-        console.log(response);
-        const items = response.data.listBusinesses.items;
-        result.push(...items);
+        };
 
-        if (response.data.listBusinesses.nextToken) {
-          return fetchAll(response.data.listBusinesses.nextToken, result);
+        const url = `${path}?country=${params.queryStringParameters.country}&fromTo=${params.queryStringParameters.fromTo}&limit=${params.queryStringParameters.limit}`;
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: params.headers,
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        const items = data.items;
+        result.push(...items);
+        if (result.length < data.total) {
+          let number = fetchPage + 50;
+          return fetchAll(number, result);
         }
 
         return result;
       };
 
       const list = await fetchAll();
+      console.log(list);
       let meses = [
         {
           mes: "enero",
@@ -208,7 +236,7 @@ const TableBusiness = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectCountry]);
 
   return (
     <div
@@ -225,6 +253,7 @@ const TableBusiness = () => {
         direction="row"
         sx={{
           marginBottom: 5,
+          alignItems: "center",
         }}
       >
         <Button
@@ -256,8 +285,20 @@ const TableBusiness = () => {
         >
           Tabla
         </Button>
+        <MultipleSelect
+          select={selectCountry}
+          setSelect={(e) => setSelectCountry(e)}
+        />
       </Stack>
-
+      <div>
+        <p>
+          {selectCountry == "Todos"
+            ? `Total de negocios registrados : ${table.length}`
+            : `Total de negocios registrados en ${
+                selectCountry == "VEN" ? "Venezuela" : "Colombia"
+              }: ${table.length}`}
+        </p>
+      </div>
       {selectedInfo === 1 ? (
         <LineChart width={850} height={350} data={data}>
           <CartesianGrid strokeDasharray="1" />

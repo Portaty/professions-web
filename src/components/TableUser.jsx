@@ -261,7 +261,9 @@ const TableUser = () => {
           Tabla
         </Button>
       </Stack>
-
+      <div>
+        <p>Total de usuarios registrados: {table.length}</p>
+      </div>
       {selectedInfo === 1 ? (
         <LineChart width={850} height={350} data={data}>
           <CartesianGrid strokeDasharray="1" />

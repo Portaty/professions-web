@@ -5,6 +5,8 @@
  **************************************************************************/
 
 export { default as studioTheme } from "./studioTheme";
+export { default as DeviceNotificationTokenCreateForm } from "./DeviceNotificationTokenCreateForm";
+export { default as DeviceNotificationTokenUpdateForm } from "./DeviceNotificationTokenUpdateForm";
 export { default as NotificationHistoryCreateForm } from "./NotificationHistoryCreateForm";
 export { default as NotificationHistoryUpdateForm } from "./NotificationHistoryUpdateForm";
 export { default as AppVersionHistoryCreateForm } from "./AppVersionHistoryCreateForm";
