@@ -13,10 +13,10 @@ import {
   SelectField,
   TextField,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Complaints } from "../models";
-import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
+import { API } from "aws-amplify";
+import { getComplaints } from "../graphql/queries";
+import { updateComplaints } from "../graphql/mutations";
 export default function ComplaintsUpdateForm(props) {
   const {
     id: idProp,
@@ -63,7 +63,12 @@ export default function ComplaintsUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? await DataStore.query(Complaints, idProp)
+        ? (
+            await API.graphql({
+              query: getComplaints.replaceAll("__typename", ""),
+              variables: { id: idProp },
+            })
+          )?.data?.getComplaints
         : complaintsModelProp;
       setComplaintsRecord(record);
     };
@@ -108,8 +113,8 @@ export default function ComplaintsUpdateForm(props) {
           businessID,
           status,
           reason,
-          description,
-          owner,
+          description: description ?? null,
+          owner: owner ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -135,21 +140,26 @@ export default function ComplaintsUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value.trim() === "") {
-              modelFields[key] = undefined;
+            if (typeof value === "string" && value === "") {
+              modelFields[key] = null;
             }
           });
-          await DataStore.save(
-            Complaints.copyOf(complaintsRecord, (updated) => {
-              Object.assign(updated, modelFields);
-            })
-          );
+          await API.graphql({
+            query: updateComplaints.replaceAll("__typename", ""),
+            variables: {
+              input: {
+                id: complaintsRecord.id,
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}

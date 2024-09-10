@@ -9,8 +9,8 @@ import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
-import { createArea } from "../graphql/mutations";
-export default function AreaCreateForm(props) {
+import { createDeviceNotificationToken } from "../graphql/mutations";
+export default function DeviceNotificationTokenCreateForm(props) {
   const {
     clearOnSuccess = true,
     onSuccess,
@@ -22,16 +22,22 @@ export default function AreaCreateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    name: "",
+    deviceID: "",
+    notificationToken: "",
   };
-  const [name, setName] = React.useState(initialValues.name);
+  const [deviceID, setDeviceID] = React.useState(initialValues.deviceID);
+  const [notificationToken, setNotificationToken] = React.useState(
+    initialValues.notificationToken
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    setName(initialValues.name);
+    setDeviceID(initialValues.deviceID);
+    setNotificationToken(initialValues.notificationToken);
     setErrors({});
   };
   const validations = {
-    name: [{ type: "Required" }],
+    deviceID: [],
+    notificationToken: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -59,7 +65,8 @@ export default function AreaCreateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
+          deviceID,
+          notificationToken,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -90,7 +97,7 @@ export default function AreaCreateForm(props) {
             }
           });
           await API.graphql({
-            query: createArea.replaceAll("__typename", ""),
+            query: createDeviceNotificationToken.replaceAll("__typename", ""),
             variables: {
               input: {
                 ...modelFields,
@@ -110,32 +117,60 @@ export default function AreaCreateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "AreaCreateForm")}
+      {...getOverrideProps(overrides, "DeviceNotificationTokenCreateForm")}
       {...rest}
     >
       <TextField
-        label="Name"
-        isRequired={true}
+        label="Device id"
+        isRequired={false}
         isReadOnly={false}
-        value={name}
+        value={deviceID}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name: value,
+              deviceID: value,
+              notificationToken,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.deviceID ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.deviceID?.hasError) {
+            runValidationTasks("deviceID", value);
           }
-          setName(value);
+          setDeviceID(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("deviceID", deviceID)}
+        errorMessage={errors.deviceID?.errorMessage}
+        hasError={errors.deviceID?.hasError}
+        {...getOverrideProps(overrides, "deviceID")}
+      ></TextField>
+      <TextField
+        label="Notification token"
+        isRequired={false}
+        isReadOnly={false}
+        value={notificationToken}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              deviceID,
+              notificationToken: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.notificationToken ?? value;
+          }
+          if (errors.notificationToken?.hasError) {
+            runValidationTasks("notificationToken", value);
+          }
+          setNotificationToken(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("notificationToken", notificationToken)
+        }
+        errorMessage={errors.notificationToken?.errorMessage}
+        hasError={errors.notificationToken?.hasError}
+        {...getOverrideProps(overrides, "notificationToken")}
       ></TextField>
       <Flex
         justifyContent="space-between"

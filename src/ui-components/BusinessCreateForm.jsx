@@ -20,10 +20,9 @@ import {
   TextField,
   useTheme,
 } from "@aws-amplify/ui-react";
-import { getOverrideProps } from "@aws-amplify/ui-react/internal";
-import { Business } from "../models";
-import { fetchByPath, validateField } from "./utils";
-import { DataStore } from "aws-amplify";
+import { fetchByPath, getOverrideProps, validateField } from "./utils";
+import { API } from "aws-amplify";
+import { createBusiness } from "../graphql/mutations";
 function ArrayField({
   items = [],
   onChange,
@@ -36,6 +35,7 @@ function ArrayField({
   defaultFieldValue,
   lengthLimit,
   getBadgeText,
+  runValidationTasks,
   errorMessage,
 }) {
   const labelElement = <Text>{label}</Text>;
@@ -59,6 +59,7 @@ function ArrayField({
     setSelectedBadgeIndex(undefined);
   };
   const addItem = async () => {
+    const { hasError } = runValidationTasks();
     if (
       currentFieldValue !== undefined &&
       currentFieldValue !== null &&
@@ -168,12 +169,7 @@ function ArrayField({
               }}
             ></Button>
           )}
-          <Button
-            size="small"
-            variation="link"
-            isDisabled={hasError}
-            onClick={addItem}
-          >
+          <Button size="small" variation="link" onClick={addItem}>
             {selectedBadgeIndex !== undefined ? "Save" : "Add"}
           </Button>
         </Flex>
@@ -350,11 +346,18 @@ export default function BusinessCreateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
-            if (typeof value === "string" && value.trim() === "") {
-              modelFields[key] = undefined;
+            if (typeof value === "string" && value === "") {
+              modelFields[key] = null;
             }
           });
-          await DataStore.save(new Business(modelFields));
+          await API.graphql({
+            query: createBusiness.replaceAll("__typename", ""),
+            variables: {
+              input: {
+                ...modelFields,
+              },
+            },
+          });
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -363,7 +366,8 @@ export default function BusinessCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
-            onError(modelFields, err.message);
+            const messages = err.errors.map((e) => e.message).join("\n");
+            onError(modelFields, messages);
           }
         }
       }}
@@ -589,6 +593,9 @@ export default function BusinessCreateForm(props) {
         label={"Images"}
         items={images}
         hasError={errors?.images?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("images", currentImagesValue)
+        }
         errorMessage={errors?.images?.errorMessage}
         setFieldValue={setCurrentImagesValue}
         inputFieldRef={imagesRef}
@@ -976,6 +983,9 @@ export default function BusinessCreateForm(props) {
         label={"Tags"}
         items={tags}
         hasError={errors?.tags?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("tags", currentTagsValue)
+        }
         errorMessage={errors?.tags?.errorMessage}
         setFieldValue={setCurrentTagsValue}
         inputFieldRef={tagsRef}
