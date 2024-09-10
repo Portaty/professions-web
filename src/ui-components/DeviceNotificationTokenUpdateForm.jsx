@@ -7,10 +7,17 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+<<<<<<< HEAD
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { getDeviceNotificationToken } from "../graphql/queries";
 import { updateDeviceNotificationToken } from "../graphql/mutations";
+=======
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { DeviceNotificationToken } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
 export default function DeviceNotificationTokenUpdateForm(props) {
   const {
     id: idProp,
@@ -45,12 +52,16 @@ export default function DeviceNotificationTokenUpdateForm(props) {
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
+<<<<<<< HEAD
         ? (
             await API.graphql({
               query: getDeviceNotificationToken.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
           )?.data?.getDeviceNotificationToken
+=======
+        ? await DataStore.query(DeviceNotificationToken, idProp)
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
         : deviceNotificationTokenModelProp;
       setDeviceNotificationTokenRecord(record);
     };
@@ -87,8 +98,13 @@ export default function DeviceNotificationTokenUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
+<<<<<<< HEAD
           deviceID: deviceID ?? null,
           notificationToken: notificationToken ?? null,
+=======
+          deviceID,
+          notificationToken,
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -114,6 +130,7 @@ export default function DeviceNotificationTokenUpdateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
+<<<<<<< HEAD
             if (typeof value === "string" && value === "") {
               modelFields[key] = null;
             }
@@ -127,13 +144,31 @@ export default function DeviceNotificationTokenUpdateForm(props) {
               },
             },
           });
+=======
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
+            }
+          });
+          await DataStore.save(
+            DeviceNotificationToken.copyOf(
+              deviceNotificationTokenRecord,
+              (updated) => {
+                Object.assign(updated, modelFields);
+              }
+            )
+          );
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
+<<<<<<< HEAD
             const messages = err.errors.map((e) => e.message).join("\n");
             onError(modelFields, messages);
+=======
+            onError(modelFields, err.message);
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
           }
         }
       }}

@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+<<<<<<< HEAD
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -16,6 +17,10 @@ export declare type Variant = {
     variantValues: VariantValues;
     overrides: EscapeHatchProps;
 };
+=======
+import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+import { DeviceNotificationToken } from "../models";
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -39,7 +44,11 @@ export declare type DeviceNotificationTokenUpdateFormProps = React.PropsWithChil
     overrides?: DeviceNotificationTokenUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
+<<<<<<< HEAD
     deviceNotificationToken?: any;
+=======
+    deviceNotificationToken?: DeviceNotificationToken;
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
     onSubmit?: (fields: DeviceNotificationTokenUpdateFormInputValues) => DeviceNotificationTokenUpdateFormInputValues;
     onSuccess?: (fields: DeviceNotificationTokenUpdateFormInputValues) => void;
     onError?: (fields: DeviceNotificationTokenUpdateFormInputValues, errorMessage: string) => void;

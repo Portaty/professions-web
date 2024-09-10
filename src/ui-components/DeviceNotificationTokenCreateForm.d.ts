@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+<<<<<<< HEAD
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -16,6 +17,9 @@ export declare type Variant = {
     variantValues: VariantValues;
     overrides: EscapeHatchProps;
 };
+=======
+import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;

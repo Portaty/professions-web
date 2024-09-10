@@ -25,6 +25,25 @@ const TableUser = () => {
   const [businessbyUser, setBusinessbyUser] = useState("");
   const [open, setOpen] = useState(false);
 
+  const formattedRows = (datos) => {
+    let nuevosDatos = [];
+    datos.map((item) => {
+      const fechaActual = new Date(item.createdAt);
+      const opciones = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "America/Caracas",
+      };
+      const fechaFormateada = fechaActual.toLocaleDateString("es-VE", opciones);
+      return nuevosDatos.push({
+        ...item,
+        date: fechaFormateada,
+      });
+    });
+    setTable(nuevosDatos);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 150 },
     {
@@ -49,25 +68,12 @@ const TableUser = () => {
       headerName: "Fecha de registro",
       width: 200,
       editable: true,
-      renderCell: (params) => {
-        const fechaActual = new Date(params.row.createdAt);
-        const opciones = {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          timeZone: "America/Caracas",
-        };
-        const fechaFormateada = fechaActual.toLocaleDateString(
-          "es-VE",
-          opciones
-        );
-        return <div>{fechaFormateada}</div>;
-      },
     },
     {
       field: "actions",
       headerName: "Negocio(s)",
       width: 250,
+      disableExport: true,
       renderCell: (params) => {
         return (
           <div>
@@ -198,6 +204,7 @@ const TableUser = () => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
       setTable(datosOrdenados);
+      formattedRows(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
@@ -254,7 +261,9 @@ const TableUser = () => {
           Tabla
         </Button>
       </Stack>
-
+      <div>
+        <p>Total de usuarios registrados: {table.length}</p>
+      </div>
       {selectedInfo === 1 ? (
         <LineChart width={850} height={350} data={data}>
           <CartesianGrid strokeDasharray="1" />

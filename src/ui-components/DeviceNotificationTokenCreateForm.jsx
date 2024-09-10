@@ -7,9 +7,16 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+<<<<<<< HEAD
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { API } from "aws-amplify";
 import { createDeviceNotificationToken } from "../graphql/mutations";
+=======
+import { getOverrideProps } from "@aws-amplify/ui-react/internal";
+import { DeviceNotificationToken } from "../models";
+import { fetchByPath, validateField } from "./utils";
+import { DataStore } from "aws-amplify";
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
 export default function DeviceNotificationTokenCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -92,6 +99,7 @@ export default function DeviceNotificationTokenCreateForm(props) {
         }
         try {
           Object.entries(modelFields).forEach(([key, value]) => {
+<<<<<<< HEAD
             if (typeof value === "string" && value === "") {
               modelFields[key] = null;
             }
@@ -104,6 +112,13 @@ export default function DeviceNotificationTokenCreateForm(props) {
               },
             },
           });
+=======
+            if (typeof value === "string" && value.trim() === "") {
+              modelFields[key] = undefined;
+            }
+          });
+          await DataStore.save(new DeviceNotificationToken(modelFields));
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -112,8 +127,12 @@ export default function DeviceNotificationTokenCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
+<<<<<<< HEAD
             const messages = err.errors.map((e) => e.message).join("\n");
             onError(modelFields, messages);
+=======
+            onError(modelFields, err.message);
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
           }
         }
       }}

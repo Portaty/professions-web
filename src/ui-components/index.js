@@ -4,6 +4,14 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
+<<<<<<< HEAD
+=======
+export { default as studioTheme } from "./studioTheme";
+export { default as DeviceNotificationTokenCreateForm } from "./DeviceNotificationTokenCreateForm";
+export { default as DeviceNotificationTokenUpdateForm } from "./DeviceNotificationTokenUpdateForm";
+export { default as NotificationHistoryCreateForm } from "./NotificationHistoryCreateForm";
+export { default as NotificationHistoryUpdateForm } from "./NotificationHistoryUpdateForm";
+>>>>>>> 1a2a97d2dae72f573ce469c5f49ff0bae2e52a4d
 export { default as AppVersionHistoryCreateForm } from "./AppVersionHistoryCreateForm";
 export { default as AppVersionHistoryUpdateForm } from "./AppVersionHistoryUpdateForm";
 export { default as AreaCreateForm } from "./AreaCreateForm";
