@@ -50,7 +50,6 @@ export default function SignIn() {
     try {
       if (!isNewPassword) {
         const user = await Auth.signIn(email, password);
-        console.log(user);
         if (user.challengeName === "NEW_PASSWORD_REQUIRED") {
           setUserChangePwd(user);
           setIsNewPassword(true);
@@ -83,9 +82,6 @@ export default function SignIn() {
   async function handleGetUSer() {
     try {
       const { username, userId, signInDetails } = await getCurrentUser();
-      console.log(`The username: ${username}`);
-      console.log(`The userId: ${userId}`);
-      console.log(`The signInDetails: ${signInDetails}`);
     } catch (err) {
       console.log(err);
     }

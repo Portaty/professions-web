@@ -12,11 +12,21 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Button, Stack, Box } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { esES } from "@mui/material/locale";
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
+} from "@mui/x-data-grid";
+import { esES } from "@mui/x-data-grid/locales";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import { cards } from "@/constants/cards";
 import Link from "next/link";
 import MultipleSelect from "./MultipleSelect";
+import GetAppIcon from "@mui/icons-material/GetApp";
 
 const TableBusiness = () => {
   const [data, setData] = useState([]);
@@ -67,9 +77,9 @@ const TableBusiness = () => {
       editable: true,
     },
     {
-      field: "country",
-      headerName: "Pais",
-      width: 150,
+      field: "address",
+      headerName: "Ubicacion",
+      width: 200,
       editable: true,
     },
     {
@@ -87,6 +97,12 @@ const TableBusiness = () => {
     {
       field: "favorites",
       headerName: "N de Favoritos",
+      width: 200,
+      editable: true,
+    },
+    {
+      field: "views",
+      headerName: "N de Visitas",
       width: 200,
       editable: true,
     },
@@ -134,7 +150,6 @@ const TableBusiness = () => {
         });
 
         const data = await response.json();
-        console.log(data);
 
         const items = data.items;
         result.push(...items);
@@ -147,7 +162,6 @@ const TableBusiness = () => {
       };
 
       const list = await fetchAll();
-      console.log(list);
       let meses = [
         {
           mes: "enero",
@@ -227,11 +241,31 @@ const TableBusiness = () => {
       const datosOrdenados = list.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
+      console.log(datosOrdenados);
       setTable(datosOrdenados);
       formattedRows(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  /* Exportar  */
+
+  const handleExport = async (rows, columns) => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Sheet 1");
+
+    worksheet.addRow(columns.map((col) => col.headerName));
+
+    rows.forEach((row) => {
+      worksheet.addRow(columns.map((col) => row[col.field]));
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, "lista_de_negocios_registrados.xlsx");
   };
 
   useEffect(() => {
@@ -331,7 +365,14 @@ const TableBusiness = () => {
               fontFamily: "Montserrat",
             }}
             showColumnVerticalBorder
-            slots={{ toolbar: GridToolbar }}
+            slots={{
+              toolbar: () => (
+                <CustomToolbar
+                  handleExport={() => handleExport(table, columns)}
+                />
+              ),
+            }}
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           />
         </Box>
       )}
@@ -340,3 +381,21 @@ const TableBusiness = () => {
 };
 
 export default TableBusiness;
+
+const CustomToolbar = ({ handleExport }) => (
+  <GridToolbarContainer>
+    <GridToolbarColumnsButton />
+    <GridToolbarFilterButton />
+    <GridToolbarDensitySelector />
+    {/* <GridToolbarExport /> */}
+    <Button
+      variant="text"
+      color="primary"
+      startIcon={<GetAppIcon />}
+      onClick={handleExport}
+      style={{ marginLeft: "-5px", fontSize: 13 }}
+    >
+      EXPORTAR
+    </Button>
+  </GridToolbarContainer>
+);
