@@ -5,10 +5,9 @@ import TableUser from "./TableUser";
 import TableBusiness from "./TableBusiness";
 
 const SelectCard = () => {
-  const [card, setCard] = useState('');
+  const [card, setCard] = useState("");
 
   const handleChange = (e) => {
-    console.log(e);
     setCard(e.target.value);
   };
   return (

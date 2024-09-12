@@ -35,7 +35,6 @@ const Notifications = () => {
       });
 
       const data = await response.json();
-      console.log(data);
       setTitle("");
       setMessage("");
     } catch (error) {
@@ -95,9 +94,13 @@ const Notifications = () => {
             </Button>
           </div>
         </Box>
-        <h2 style={{
-          marginTop: 40
-        }}>Historial de notificaciones</h2>
+        <h2
+          style={{
+            marginTop: 40,
+          }}
+        >
+          Historial de notificaciones
+        </h2>
 
         <TableNotification />
       </div>

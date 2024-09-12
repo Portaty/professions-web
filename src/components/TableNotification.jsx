@@ -6,7 +6,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { esES } from "@mui/material/locale";
 
 const TableNotification = () => {
-//   const [data, setData] = useState([]);
+  //   const [data, setData] = useState([]);
   const [table, setTable] = useState([]);
 
   const columns = [
@@ -54,7 +54,6 @@ const TableNotification = () => {
             nextToken,
           },
         });
-        console.log(response);
         const items = response.data.listNotificationHistories.items;
         result.push(...items);
 

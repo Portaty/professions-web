@@ -17,7 +17,6 @@ const ModalBusinessbyUser = ({ open, close, data }) => {
         userID: data,
       },
     });
-    console.log(response);
     if (response?.data?.listBusinessbyUserID?.items.length === 0) {
       alert("Este usuario no tiene negocios registrados");
       return;
@@ -49,7 +48,6 @@ const ModalBusinessbyUser = ({ open, close, data }) => {
                   <h2>{`Vista previa del negocio`}</h2>
                 </div>
                 <div className={styles.inputs}>
-                  {console.log("aqui", business)}
                   <div className={styles.input}>
                     <TextField
                       id="outlined-basic"
@@ -111,7 +109,6 @@ const ModalBusinessbyUser = ({ open, close, data }) => {
                     />
                   </div>
                   <div className={styles.input}>
-                    {console.log(act.sub)}
                     <TextField
                       id="outlined-basic"
                       defaultValue={act?.sub}
