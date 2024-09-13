@@ -27,6 +27,7 @@ import { cards } from "@/constants/cards";
 import ModalBusinessbyUser from "./ModalBusinessbyUser";
 import { isNumber } from "@mui/x-data-grid/internals";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import MultipleSelect from "./MultipleSelect";
 
 const TableUser = () => {
   const [data, setData] = useState([]);
@@ -34,6 +35,7 @@ const TableUser = () => {
   const [selectedInfo, setSelectedInfo] = useState(1);
   const [businessbyUser, setBusinessbyUser] = useState("");
   const [open, setOpen] = useState(false);
+  const [selectCountry, setSelectCountry] = useState(`Todos`);
 
   const formattedRows = (datos) => {
     let nuevosDatos = [];
@@ -80,31 +82,45 @@ const TableUser = () => {
       editable: true,
     },
     {
+      field: "country",
+      headerName: "Ubicacion",
+      width: 200,
+      editable: true,
+    },
+    {
       field: "actions",
       headerName: "Negocio(s)",
-      width: 250,
+      width: 350,
       disableExport: true,
       renderCell: (params) => {
         return (
           <div>
-            <button
-              onClick={() => {
-                setBusinessbyUser(params.row.id);
-                setOpen(true);
-              }}
-              style={{
-                padding: 7,
-                outline: "none",
-                backgroundColor: "green",
-                border: "none",
-                borderRadius: 4,
-                color: "#fff",
-                marginLeft: 5,
-                fontSize: 12,
-              }}
-            >
-              Negocios
-            </button>
+            {params.row.business.length !== 0 ? (
+              <div>
+                Tiene {params.row.business.length} negocio/s
+                <button
+                  onClick={() => {
+                    setBusinessbyUser(params.row.id);
+                    console.log(params.row.business.length !== 0);
+                    setOpen(true);
+                  }}
+                  style={{
+                    padding: 7,
+                    outline: "none",
+                    backgroundColor: "green",
+                    border: "none",
+                    borderRadius: 4,
+                    color: "#fff",
+                    marginLeft: 30,
+                    fontSize: 12,
+                  }}
+                >
+                  Ver negocio/s
+                </button>
+              </div>
+            ) : (
+              <div>No tiene negocio/s</div>
+            )}
           </div>
         );
       },
@@ -112,25 +128,39 @@ const TableUser = () => {
   ];
   const fetchData = async () => {
     try {
-      const fetchAll = async (nextToken, result = []) => {
-        const response = await API.graphql({
-          query: queries.listUsers,
-          authMode: "AMAZON_COGNITO_USER_POOLS",
-          variables: {
-            nextToken,
+      const fetchAll = async (from = 0, result = []) => {
+        let fetchPage = from;
+        const path = "/api/totalFilterbyCountryUsers";
+        const params = {
+          headers: {},
+          queryStringParameters: {
+            country: selectCountry === "Todos" ? "" : selectCountry,
+            fromTo: fetchPage,
+            limit: 50,
           },
-        });
-        const items = response.data.listUsers.items;
-        result.push(...items);
+        };
 
-        if (response.data.listUsers.nextToken) {
-          return fetchAll(response.data.listUsers.nextToken, result);
+        const url = `${path}?country=${params.queryStringParameters.country}&fromTo=${params.queryStringParameters.fromTo}&limit=${params.queryStringParameters.limit}`;
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: params.headers,
+        });
+
+        const data = await response.json();
+
+        const items = data.items;
+        result.push(...items);
+        if (result.length < data.total) {
+          let number = fetchPage + 50;
+          return fetchAll(number, result);
         }
 
         return result;
       };
 
       const list = await fetchAll();
+
       let meses = [
         {
           mes: "enero",
@@ -214,6 +244,7 @@ const TableUser = () => {
       );
       setTable(datosOrdenados);
       formattedRows(datosOrdenados);
+      console.log(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
@@ -222,20 +253,55 @@ const TableUser = () => {
   /* Exportar  */
 
   const handleExport = async (rows, columns) => {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Sheet 1");
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Sheet 1");
+      const filteredColumns = columns.map((col) => {
+        if (col.field === "actions") {
+          return { ...col, headerName: "" };
+        }
+        return col;
+      });
+      const headers = filteredColumns.map((col) => col.headerName);
+      headers.push(
+        "Nombre del Negocio",
+        "Area",
+        "Actividad",
+        "Dirección",
+        "Teléfono",
+        "Imagen"
+      );
+      worksheet.addRow(headers);
 
-    worksheet.addRow(columns.map((col) => col.headerName));
+      rows.forEach((row) => {
+        const rowData = columns.map((col) => row[col.field] || "");
 
-    rows.forEach((row) => {
-      worksheet.addRow(columns.map((col) => row[col.field]));
-    });
+        if (row.business && row.business.length > 0) {
+          const business = row.business[0];
+          const work = JSON.parse(business.activity);
+          rowData.push(
+            business.name || "",
+            work.main || "",
+            work.sub || "",
+            business.address || "",
+            business.phone || "",
+            business.thumbnail || ""
+          );
+        } else {
+          rowData.push("", "", "", "", "");
+        }
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    saveAs(blob, "lista_de_usuarios_registrados.xlsx");
+        worksheet.addRow(rowData);
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "lista_de_usuarios_registrados.xlsx");
+    } catch (error) {
+      console.error("Error al exportar a Excel:", error);
+    }
   };
 
   useEffect(() => {
@@ -288,6 +354,10 @@ const TableUser = () => {
         >
           Tabla
         </Button>
+        <MultipleSelect
+          select={selectCountry}
+          setSelect={(e) => setSelectCountry(e)}
+        />
       </Stack>
       <div>
         <p>Total de usuarios registrados: {table.length}</p>
