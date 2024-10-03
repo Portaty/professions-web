@@ -1,7 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import React from "react";
 
-const MultipleSelect = ({ select, setSelect, reset }) => {
+const MultipleSelectDate = ({ select, setSelect, reset }) => {
   return (
     <div
       style={{
@@ -9,24 +9,24 @@ const MultipleSelect = ({ select, setSelect, reset }) => {
       }}
     >
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">{`Filtrar por pais`}</InputLabel>
+        <InputLabel id="demo-simple-select-label">{`Filtrar por fecha`}</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={select}
-          label="Filtrar por pais"
+          label="Filtrar por fecha"
           onChange={(e) => {
             setSelect(e.target.value);
             reset();
           }}
         >
-          <MenuItem value={`Todos`}>Todos</MenuItem>
-          <MenuItem value={`VEN`}>Venezuela</MenuItem>
-          <MenuItem value={`COL`}>Colombia</MenuItem>
+          <MenuItem value={`7D`}>Ultimos 7 dias</MenuItem>
+          <MenuItem value={`30D`}>Ultimos 30 dias</MenuItem>
+          <MenuItem value={`12M`}>Ultimos 12 meses</MenuItem>
         </Select>
       </FormControl>
     </div>
   );
 };
 
-export default MultipleSelect;
+export default MultipleSelectDate;

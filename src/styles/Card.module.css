@@ -1,0 +1,62 @@
+.card {
+  border: 1px solid #1f1f1f;
+  padding: 1rem;
+  border-radius: 6px;
+  height: 210px;
+  margin-right: 1rem;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+.title {
+  font-size: 18px;
+  font-weight: 500;
+}
+.contentTitle {
+  font-size: 44px;
+  font-weight: 700;
+}
+.content span {
+  font-size: 16px;
+  font-weight: 500;
+}
+.contentSummary {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+}
+.cardSummary {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #1f1f1f;
+  border-radius: 6px;
+  padding: 15px;
+  width: 150px;
+  height: 125px;
+  justify-content: center;
+  /* align-items: center; */
+}
+.titleSummary {
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  border-bottom: 1px solid #1f1f1f;
+  padding-bottom: 5px;
+}
+.textSummary {
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+.totalSummary {
+  margin: 5px 0;
+  font-size: 44px;
+  text-align: center;
+  font-weight: 700;
+}
