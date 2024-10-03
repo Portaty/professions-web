@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Button, Stack, Box } from "@mui/material";
+import { Button, Stack, Box, Typography } from "@mui/material";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -19,6 +19,7 @@ import {
   GridToolbarColumnsButton,
   GridToolbarFilterButton,
   GridToolbarDensitySelector,
+  GridPagination,
 } from "@mui/x-data-grid";
 import { esES } from "@mui/x-data-grid/locales";
 import ExcelJS from "exceljs";
@@ -27,14 +28,26 @@ import { cards } from "@/constants/cards";
 import Link from "next/link";
 import MultipleSelect from "./MultipleSelect";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import MultipleSelectDate from "./MultipleSelectDate";
 
 const TableBusiness = () => {
   const [data, setData] = useState([]);
+  const [dataExcel, setDataExcel] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [totalTable, setTotalTable] = useState(0);
   const [table, setTable] = useState([]);
+  const [pagination, setPagination] = useState(0);
+  const [tableExcel, setTableExcel] = useState([]);
   const [selectCountry, setSelectCountry] = useState(`Todos`);
+  const [selectRange, setSelectRange] = useState(`12M`);
   const [selectedInfo, setSelectedInfo] = useState(1);
+  const [page, setPage] = useState(0);
+  const pageSize = 10;
+  const [loading, setLoading] = useState(false);
 
   const formattedRows = (datos) => {
+    setLoading(true);
+
     let nuevosDatos = [];
     datos.map((item) => {
       const fechaActual = new Date(item.createdAt);
@@ -53,7 +66,11 @@ const TableBusiness = () => {
         date: fechaFormateada,
       });
     });
-    setTable(nuevosDatos);
+    let array = [...table, ...nuevosDatos];
+    array.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    console.log(array);
+    setTable(array);
+    setLoading(false);
   };
 
   const columns = [
@@ -128,7 +145,53 @@ const TableBusiness = () => {
       },
     },
   ];
+
   const fetchData = async () => {
+    setLoading(true);
+    /* Grafico */
+    const path = "/api/totalBusinessGraphics";
+    const params = {
+      headers: {},
+      queryStringParameters: {
+        country: selectCountry === "Todos" ? "" : selectCountry,
+        range: selectRange,
+      },
+    };
+    const url = `${path}?country=${params.queryStringParameters.country}&range=${params.queryStringParameters.range}`;
+    const response = await fetch(url, {
+      method: "GET",
+    });
+    const dataGraphics = await response.json();
+
+    /* Tabla */
+
+    const pathTable = "/api/totalBusinessTable";
+    const paramsTable = {
+      headers: {},
+      queryStringParameters: {
+        country: selectCountry === "Todos" ? "" : selectCountry,
+        range: selectRange,
+        fromTo: pagination,
+        limit: 10,
+      },
+    };
+
+    const urlTable = `${pathTable}?country=${paramsTable.queryStringParameters.country}&range=${paramsTable.queryStringParameters.range}&fromTo=${paramsTable.queryStringParameters.fromTo}&limit=${paramsTable.queryStringParameters.limit}`;
+
+    const responseTable = await fetch(urlTable, {
+      method: "GET",
+    });
+    const dataTable = await responseTable.json();
+
+    setData(dataGraphics?.data);
+    formattedRows(dataTable?.items);
+    setTotalTable(dataTable.total);
+    setTotal(dataGraphics?.total);
+    setPagination(pagination + 10);
+    setLoading(false);
+  };
+
+  const fetchDataExcel = async () => {
     try {
       const fetchAll = async (from = 0, result = []) => {
         let fetchPage = from;
@@ -237,13 +300,11 @@ const TableBusiness = () => {
         }
       });
 
-      setData(meses);
+      setDataExcel(meses);
       const datosOrdenados = list.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
-      console.log(datosOrdenados);
-      setTable(datosOrdenados);
-      formattedRows(datosOrdenados);
+      setTableExcel(datosOrdenados);
     } catch (error) {
       console.error(error);
     }
@@ -268,14 +329,33 @@ const TableBusiness = () => {
     saveAs(blob, "lista_de_negocios_registrados.xlsx");
   };
 
+  /* Paginacion */
+  const handleNextPage = () => {
+    fetchData();
+    setPage((prevPage) =>
+      Math.min(prevPage + 1, Math.ceil(totalTable / pageSize) - 1)
+    );
+    console.log(page);
+  };
+
+  const reset = () => {
+    setPagination(0);
+    setTable([]);
+  };
+
   useEffect(() => {
     fetchData();
-  }, [selectCountry]);
+  }, [selectCountry, selectRange]);
+
+  useEffect(() => {
+    fetchDataExcel();
+  }, []);
 
   return (
     <div
       style={{
-        paddingTop: 10,
+        marginTop: 40,
+        paddingBottom: 30,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -322,21 +402,27 @@ const TableBusiness = () => {
         <MultipleSelect
           select={selectCountry}
           setSelect={(e) => setSelectCountry(e)}
+          reset={() => reset()}
+        />
+        <MultipleSelectDate
+          select={selectRange}
+          setSelect={(e) => setSelectRange(e)}
+          reset={() => reset()}
         />
       </Stack>
       <div>
         <p>
           {selectCountry == "Todos"
-            ? `Total de negocios registrados : ${table.length}`
+            ? `Total de negocios registrados : ${total}`
             : `Total de negocios registrados en ${
                 selectCountry == "VEN" ? "Venezuela" : "Colombia"
-              }: ${table.length}`}
+              }: ${total}`}
         </p>
       </div>
       {selectedInfo === 1 ? (
-        <LineChart width={850} height={350} data={data}>
+        <LineChart width={1000} height={400} data={data}>
           <CartesianGrid strokeDasharray="1" />
-          <XAxis dataKey="mes" fontSize={12} fontWeight={600} />
+          <XAxis dataKey="date" fontSize={12} fontWeight={600} />
           <YAxis />
           <Tooltip />
           <Legend />
@@ -348,32 +434,58 @@ const TableBusiness = () => {
           />
         </LineChart>
       ) : (
-        <Box sx={{ height: 380, width: 950 }}>
+        <Box sx={{ height: 500, width: 1000 }}>
           <DataGrid
             rows={table}
             columns={columns}
+            hideFooterPagination={true}
+            paginationMode="server"
             initialState={{
               pagination: {
                 paginationModel: {
                   pageSize: 10,
+                  page: page,
                 },
               },
             }}
-            pageSizeOptions={[10]}
             density="compact"
             sx={{
               fontFamily: "Montserrat",
             }}
+            loading={loading}
             showColumnVerticalBorder
             slots={{
               toolbar: () => (
                 <CustomToolbar
-                  handleExport={() => handleExport(table, columns)}
+                  handleExport={() => handleExport(tableExcel, columns)}
                 />
               ),
             }}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingBottom: 5,
+            }}
+          >
+            <Typography variant="body2">
+              {1}-{table.length} de {totalTable} negocios
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={handleNextPage}
+              disabled={loading || (page + 1) * pageSize >= totalTable}
+              sx={{
+                marginBottom: 3,
+              }}
+            >
+              Cargar mas negocios
+            </Button>
+          </Box>
         </Box>
       )}
     </div>
