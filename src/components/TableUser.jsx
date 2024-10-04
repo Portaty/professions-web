@@ -176,6 +176,7 @@ const TableUser = () => {
       method: "GET",
     });
     const dataTable = await responseTable.json();
+
     console.log("aqui", dataTable);
     setData(dataGraphics?.data);
     formattedRows(dataTable?.items);
@@ -302,7 +303,6 @@ const TableUser = () => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
       setTableExcel(datosOrdenados);
-      formattedRows(datosOrdenados);
       console.log(datosOrdenados);
     } catch (error) {
       console.error(error);
