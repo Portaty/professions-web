@@ -14,6 +14,14 @@
   gap: 2rem;
   overflow: auto;
 }
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  padding: 30px;
+}
 .users,
 .business,
 .contentBusiness,
@@ -23,6 +31,7 @@
 .contentBusiness,
 .contentUsers {
   flex-direction: column;
+  margin-bottom: 2rem;
 }
 .title {
   font-size: 26px;

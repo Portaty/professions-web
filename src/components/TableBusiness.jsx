@@ -73,6 +73,34 @@ const TableBusiness = () => {
     setLoading(false);
   };
 
+  const fetchDocument = async (businessId, identityId) => {
+    const path = "/api/documentQR";
+    const params = {
+      headers: {},
+      queryStringParameters: {
+        businessid: businessId,
+        identityid: identityId,
+      },
+    };
+    const url = `${path}?businessid=${params.queryStringParameters.businessid}&identityid=${params.queryStringParameters.identityid}`;
+    const response = await fetch(url, {
+      method: "GET",
+    });
+    const documentQR = await response.json();
+    console.log(documentQR);
+
+    const pdfUrl = documentQR.url;
+
+    const pdfResponse = await fetch(pdfUrl);
+    const blob = await pdfResponse.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "documentQR.pdf";
+    link.click();
+
+    // URL.revokeObjectURL(link.href);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 150 },
     {
@@ -140,6 +168,29 @@ const TableBusiness = () => {
             <Link href={params.row.thumbnail} target="_blank">
               Ver foto
             </Link>
+          </div>
+        );
+      },
+    },
+    {
+      field: "document",
+      headerName: "QR",
+      width: 150,
+      editable: false,
+      renderCell: (params) => {
+        return (
+          <div>
+            <a
+              onClick={() =>
+                fetchDocument(params.row.id, params.row.identityID)
+              }
+              style={{
+                color: "blue",
+                cursor: "pointer",
+              }}
+            >
+              Descargar QR
+            </a>
           </div>
         );
       },
